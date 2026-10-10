@@ -12,6 +12,7 @@ Requirements: PHP 7.4+, Composer 2, Node.js 20.9+, WP-CLI (for translations).
 make install   # composer install && npm ci
 make build-js  # build assets into assets/dist
 make test      # run PHPUnit
+npm test       # run the JavaScript tests (Node 22+)
 make smoke     # smoke test the release build from make dist
 make lint      # WordPress Coding Standards and PHP 7.4+ compatibility (make lint-fix to auto-fix)
 ```
