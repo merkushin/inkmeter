@@ -21,6 +21,8 @@ class Connection {
 
 	public const FEATURE_HISTORY = 'history';
 
+	public const FEATURE_RECAPS = 'recaps';
+
 	/**
 	 * @var Options
 	 */

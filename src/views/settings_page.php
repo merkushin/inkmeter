@@ -10,6 +10,8 @@
  * @var bool        $is_pro           Whether the account has Pro reminders.
  * @var bool        $reminder_enabled
  * @var int         $reminder_hour    0-23, in the site's timezone.
+ * @var bool        $has_recaps       Whether the account gets weekly recap emails.
+ * @var bool        $recap_enabled
  * @var string      $timezone         The site's timezone, e.g. "America/Mexico_City" or "+03:00".
  * @var string|null $synced_ago       How long ago the days were last synced, e.g. "5 mins"; null if never.
  * @var int|null    $streak           The streak Inkmeter has, across the account's sites; null if unknown.
@@ -37,6 +39,7 @@ defined( 'ABSPATH' ) || exit;
 		<p><?php esc_html_e( 'Never lose a streak by accident. With Inkmeter Pro:', 'inkmeter' ); ?></p>
 		<ul class="ul-disc">
 			<li><?php esc_html_e( 'You get an email at the hour you choose when you haven\'t published yet that day.', 'inkmeter' ); ?></li>
+			<li><?php esc_html_e( 'Every week, an email recaps the days you wrote, your streak and streak freezes left.', 'inkmeter' ); ?></li>
 			<li><?php esc_html_e( 'Your streak history is kept in your Inkmeter account, so it survives reinstalls and site moves.', 'inkmeter' ); ?></li>
 		</ul>
 		<p>
@@ -111,7 +114,7 @@ defined( 'ABSPATH' ) || exit;
 		</table>
 
 		<?php if ( $is_pro ) : ?>
-			<h2><?php esc_html_e( 'Reminders', 'inkmeter' ); ?></h2>
+			<h2><?php esc_html_e( 'Emails', 'inkmeter' ); ?></h2>
 			<form method="post" action="<?php echo esc_url( $action_url ); ?>">
 				<input type="hidden" name="action" value="inkmeter_reminders" />
 				<?php wp_nonce_field( 'inkmeter_reminders' ); ?>
@@ -142,8 +145,23 @@ defined( 'ABSPATH' ) || exit;
 							</p>
 						</td>
 					</tr>
+					<?php if ( $has_recaps ) : ?>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Weekly recap', 'inkmeter' ); ?></th>
+							<td>
+								<label for="inkmeter-recap-enabled">
+									<input type="checkbox" id="inkmeter-recap-enabled" name="recap_enabled" value="1"<?php checked( $recap_enabled ); ?> />
+									<?php
+									/* translators: %s: Account email address. */
+									echo esc_html( sprintf( __( 'Email %s a recap of my writing week', 'inkmeter' ), $email ) );
+									?>
+								</label>
+								<p class="description"><?php esc_html_e( 'On the first day of your week, at 09:00: the days you published, your streak and streak freezes left. Skipped when you haven\'t published for 4 weeks.', 'inkmeter' ); ?></p>
+							</td>
+						</tr>
+					<?php endif; ?>
 				</table>
-				<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save reminders', 'inkmeter' ); ?></button></p>
+				<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save email settings', 'inkmeter' ); ?></button></p>
 			</form>
 
 			<form method="post" action="<?php echo esc_url( $action_url ); ?>">
