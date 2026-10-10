@@ -11,6 +11,7 @@ use Merkushin\Wpal\Service\Plugins;
 use Merkushin\Wpal\Service\Screen;
 use Merkushin\Wpal\Service\UserSettings;
 use Merkushin\Wpal\ServiceFactory;
+use Merkushin\Inkmeter\Editor;
 use Merkushin\Inkmeter\Goal;
 use Merkushin\Inkmeter\GoalForm;
 use Merkushin\Inkmeter\Pro\Pro;
@@ -64,6 +65,11 @@ class PluginTest extends TestCase {
 	 */
 	private $pro;
 
+	/**
+	 * @var Editor&MockObject
+	 */
+	private $editor;
+
 	protected function setUp(): void {
 		$this->assets       = $this->createMock( Assets::class );
 		$this->screen       = $this->createMock( Screen::class );
@@ -73,6 +79,7 @@ class PluginTest extends TestCase {
 		$this->streak->method( 'goal' )->willReturn( Goal::daily() );
 		$this->goal_form = $this->createMock( GoalForm::class );
 		$this->pro       = $this->createMock( Pro::class );
+		$this->editor    = $this->createMock( Editor::class );
 		$this->goal_form->method( 'action_url' )->willReturn( 'https://example.com/wp-admin/admin-post.php' );
 
 		$this->user_settings = $this->createMock( UserSettings::class );
@@ -107,7 +114,7 @@ class PluginTest extends TestCase {
 	public function testInit_Always_RegistersAdminHooksAndInitsStreakGoalFormAndPro(): void {
 		$hooks = $this->createMock( Hooks::class );
 		ServiceFactory::set_custom_hooks( $hooks );
-		$plugin = new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro );
+		$plugin = new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor );
 
 		$registered = [];
 		$record     = function ( string $hook, $callback ) use ( &$registered ): bool {
@@ -119,6 +126,7 @@ class PluginTest extends TestCase {
 		$this->streak->expects( $this->once() )->method( 'init' );
 		$this->goal_form->expects( $this->once() )->method( 'init' );
 		$this->pro->expects( $this->once() )->method( 'init' );
+		$this->editor->expects( $this->once() )->method( 'init' );
 
 		$plugin->init();
 
@@ -144,7 +152,7 @@ class PluginTest extends TestCase {
 			->method( 'wp_enqueue_script' )
 			->with( 'inkmeter-admin', self::PLUGIN_URL . 'assets/dist/javascript/admin.js', [ 'utils' ], Plugin::VERSION, true );
 
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->enqueue_admin_assets();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->enqueue_admin_assets();
 	}
 
 	/**
@@ -158,7 +166,7 @@ class PluginTest extends TestCase {
 		$this->assets->expects( $this->never() )->method( 'wp_enqueue_style' );
 		$this->assets->expects( $this->never() )->method( 'wp_enqueue_script' );
 
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->enqueue_admin_assets();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->enqueue_admin_assets();
 	}
 
 	/**
@@ -172,7 +180,7 @@ class PluginTest extends TestCase {
 		$this->streak->expects( $this->never() )->method( 'get_summary' );
 
 		$this->expectOutputString( '' );
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
 	}
 
 	public function testRenderStreakPanel_PostsScreen_RendersLocalizedSummary(): void {
@@ -199,7 +207,7 @@ class PluginTest extends TestCase {
 			);
 
 		ob_start();
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
 		$text = trim( (string) preg_replace( '/\s+/', ' ', strip_tags( (string) ob_get_clean() ) ) );
 
 		$this->assertStringContainsString( 'You are still alive, publish today to keep it going', $text );
@@ -228,7 +236,7 @@ class PluginTest extends TestCase {
 		$this->dates->expects( $this->never() )->method( 'wp_date' );
 
 		ob_start();
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
 		$text = trim( (string) preg_replace( '/\s+/', ' ', strip_tags( (string) ob_get_clean() ) ) );
 
 		$this->assertStringContainsString( 'Start your next streak', $text );
@@ -403,7 +411,7 @@ class PluginTest extends TestCase {
 	}
 
 	public function testAddScreenOption_PostsScreen_AppendsCheckedToggle(): void {
-		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->add_screen_option( '<p>core</p>', (object) [ 'id' => 'edit-post' ] );
+		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->add_screen_option( '<p>core</p>', (object) [ 'id' => 'edit-post' ] );
 
 		$this->assertStringStartsWith( '<p>core</p>', $settings );
 		$this->assertStringContainsString( 'id="inkmeter-panel-toggle"', $settings );
@@ -414,7 +422,7 @@ class PluginTest extends TestCase {
 	public function testAddScreenOption_PanelHidden_AppendsUncheckedToggle(): void {
 		$this->use_panel_setting( 'off' );
 
-		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->add_screen_option( '', (object) [ 'id' => 'edit-post' ] );
+		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->add_screen_option( '', (object) [ 'id' => 'edit-post' ] );
 
 		$this->assertStringContainsString( 'id="inkmeter-panel-toggle"', $settings );
 		$this->assertStringNotContainsString( 'checked', $settings );
@@ -426,7 +434,7 @@ class PluginTest extends TestCase {
 	 * @param object|null $screen
 	 */
 	public function testAddScreenOption_OtherScreen_KeepsSettingsUnchanged( $screen ): void {
-		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->add_screen_option( '<p>core</p>', $screen );
+		$settings = ( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->add_screen_option( '<p>core</p>', $screen );
 
 		$this->assertSame( '<p>core</p>', $settings );
 	}
@@ -454,7 +462,7 @@ class PluginTest extends TestCase {
 		);
 
 		ob_start();
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
 
 		return (string) ob_get_clean();
 	}
@@ -473,7 +481,7 @@ class PluginTest extends TestCase {
 		$this->dates->method( 'wp_date' )->willReturn( 'March 3, 2026' );
 
 		ob_start();
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
 
 		return trim( (string) preg_replace( '/\s+/', ' ', html_entity_decode( strip_tags( (string) ob_get_clean() ), ENT_QUOTES ) ) );
 	}

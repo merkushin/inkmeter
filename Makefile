@@ -3,7 +3,7 @@ BUILD_DIR := build/$(PLUGIN)
 ZIP       := $(PLUGIN).zip
 WP        ?= wp
 
-POT_ARGS := --slug=$(PLUGIN) --domain=$(PLUGIN) --include=$(PLUGIN).php,src --exclude=build,vendor,node_modules,tests \
+POT_ARGS := --slug=$(PLUGIN) --domain=$(PLUGIN) --include=$(PLUGIN).php,src,assets/javascript --exclude=build,vendor,node_modules,tests \
 	--headers='{"Report-Msgid-Bugs-To":"https://github.com/merkushin/inkmeter/issues"}'
 
 # Files and directories that ship in the plugin zip.

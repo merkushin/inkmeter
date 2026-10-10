@@ -92,6 +92,9 @@ jobs:
 
       - run: make dist
 
+      - name: JavaScript tests
+        run: npm test
+
       - name: Smoke test the build
         run: make smoke
 
