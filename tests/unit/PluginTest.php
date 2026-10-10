@@ -233,7 +233,7 @@ class PluginTest extends TestCase {
 				return (string) $number;
 			}
 		);
-		$this->dates->expects( $this->never() )->method( 'wp_date' );
+		$this->dates->method( 'current_time' )->willReturn( '2026-03-02' );
 
 		ob_start();
 		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->render_streak_panel();
@@ -408,6 +408,62 @@ class PluginTest extends TestCase {
 		$this->pro->method( 'freezes_left' )->willReturn( null );
 
 		$this->assertStringNotContainsString( 'inkmeter-panel__freezes', $this->render_panel() );
+	}
+
+	public function testRenderStreakPanel_History_ShowsThreeMonthsWithoutPro(): void {
+		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
+		$this->dates->method( 'wp_date' )->willReturn( 'Mar 2' );
+		$html = $this->render_panel_with(
+			[
+				'recent_days' => [ '2026-03-02', '2026-03-03' ],
+				'frozen'      => [ '2026-03-04' ],
+			]
+		);
+
+		$this->assertSame( 13 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 3, '13 weeks of days, plus the legend' );
+		$this->assertStringContainsString( 'Last 3 months', $html );
+		$this->assertStringContainsString( 'Published on 2 of 88 days', $html );
+		$this->assertStringContainsString( 'class="inkmeter-history__day is-frozen" title="Mar 2: covered by a streak freeze"', $html );
+		$this->assertStringContainsString( 'Streak freeze', $html );
+	}
+
+	public function testRenderStreakPanel_HistoryWithPro_ShowsThePastYear(): void {
+		$this->pro->method( 'has_full_history' )->willReturn( true );
+		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
+
+		$html = $this->render_panel_with( [ 'recent_days' => [] ] );
+
+		$this->assertSame( 53 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 2, '53 weeks, plus the legend without freezes' );
+		$this->assertStringContainsString( 'Past year', $html );
+	}
+
+	/**
+	 * @param array<string, mixed> $fields Added to a daily summary.
+	 */
+	private function render_panel_with( array $fields ): string {
+		$this->screen->method( 'get_current_screen' )->willReturn( (object) [ 'id' => 'edit-post' ] );
+		$this->streak->method( 'week_start' )->willReturn( 1 );
+		$this->streak->method( 'get_summary' )->willReturn(
+			array_merge(
+				[
+					'streak'          => 2,
+					'last_post_date'  => '2026-03-03',
+					'is_active_today' => false,
+					'next_milestone'  => 3,
+				],
+				$fields
+			)
+		);
+		$this->localization->method( 'number_format_i18n' )->willReturnCallback(
+			function ( $number ): string {
+				return (string) $number;
+			}
+		);
+
+		ob_start();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro ) )->render_streak_panel();
+
+		return (string) ob_get_clean();
 	}
 
 	public function testAddScreenOption_PostsScreen_AppendsCheckedToggle(): void {

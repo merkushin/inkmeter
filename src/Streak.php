@@ -89,7 +89,20 @@ class Streak {
 			return $cached['summary'];
 		}
 
-		$summary = $this->calculator->calculate( $this->post_dates->get_dates(), $today, $goal, $week_start, $frozen );
+		$dates   = $this->post_dates->get_dates();
+		$summary = $this->calculator->calculate( $dates, $today, $goal, $week_start, $frozen );
+
+		// For the history calendar: the past year's days (a year of weeks fits in 371) and the freezes.
+		$since                  = gmdate( 'Y-m-d', (int) strtotime( $today . ' -371 days' ) );
+		$summary['recent_days'] = array_values(
+			array_filter(
+				$dates,
+				static function ( string $date ) use ( $since, $today ): bool {
+					return $date >= $since && $date <= $today;
+				}
+			)
+		);
+		$summary['frozen']      = $frozen;
 
 		$this->transient->set_transient(
 			self::TRANSIENT_KEY,
@@ -105,6 +118,10 @@ class Streak {
 
 	public function goal(): Goal {
 		return $this->goal_settings->goal();
+	}
+
+	public function week_start(): int {
+		return $this->goal_settings->week_start();
 	}
 
 	public function save_goal( Goal $goal ): void {
