@@ -19,6 +19,8 @@ class Connection {
 
 	public const FEATURE_FREEZES = 'freezes';
 
+	public const FEATURE_HISTORY = 'history';
+
 	/**
 	 * @var Options
 	 */
