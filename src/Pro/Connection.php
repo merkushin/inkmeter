@@ -100,16 +100,18 @@ class Connection {
 	}
 
 	/**
-	 * Keeps the freezes from a streak the API returned (/v1/days or /v1/streak).
+	 * Keeps the freezes and history days from a streak the API returned (/v1/days or /v1/streak).
 	 *
 	 * @param array<string, mixed> $streak
 	 */
 	public function record_streak( array $streak ): void {
-		$frozen = $streak['frozen'] ?? [];
+		$frozen  = $streak['frozen'] ?? [];
+		$history = $streak['history_days'] ?? [];
 
 		$this->set(
 			[
 				'frozen'       => is_array( $frozen ) ? array_values( array_filter( $frozen, 'is_string' ) ) : [],
+				'history_days' => is_array( $history ) ? array_values( array_filter( $history, 'is_string' ) ) : [],
 				'frozen_unit'  => (string) ( $streak['unit'] ?? 'day' ),
 				'freezes_left' => (int) ( $streak['freezes_left'] ?? 0 ),
 			]
@@ -128,6 +130,17 @@ class Connection {
 		}
 
 		return $data['frozen'];
+	}
+
+	/**
+	 * The past year's days with a post on any of the account's sites, as of the last sync.
+	 *
+	 * @return string[]
+	 */
+	public function history_days(): array {
+		$days = $this->get()['history_days'] ?? [];
+
+		return is_array( $days ) ? $days : [];
 	}
 
 	public function freezes_left(): int {

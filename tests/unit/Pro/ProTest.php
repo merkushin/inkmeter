@@ -89,4 +89,32 @@ class ProTest extends TestCase {
 		$this->assertSame( [], $pro->frozen_periods( [], 'day' ) );
 		$this->assertNull( $pro->freezes_left() );
 	}
+
+	public function testHistoryDays_WithHistory_ReturnsTheAccountsDays(): void {
+		$this->connection->connect(
+			'sfs_token',
+			'writer@example.com',
+			[
+				'plan'     => 'pro',
+				'features' => [ 'history' ],
+			]
+		);
+		$this->connection->record_streak( [ 'history_days' => [ '2026-10-07', 8, '2026-10-08' ] ] );
+
+		$this->assertSame( [ '2026-10-07', '2026-10-08' ], ( new Pro( '1.1.0' ) )->history_days() );
+	}
+
+	public function testHistoryDays_WithoutHistory_ReturnsNull(): void {
+		$this->connection->connect(
+			'sfs_token',
+			'writer@example.com',
+			[
+				'plan'     => 'free',
+				'features' => [],
+			]
+		);
+		$this->connection->record_streak( [ 'history_days' => [ '2026-10-08' ] ] );
+
+		$this->assertNull( ( new Pro( '1.1.0' ) )->history_days() );
+	}
 }
