@@ -30,7 +30,7 @@ There is nothing else to configure. The panel only appears on the Posts list scr
 
 = Inkmeter Pro (optional) =
 
-Connect your site to Inkmeter Pro under **Settings → Inkmeter** to get an email at the hour you choose when your goal needs a post today, before your streak breaks, and 2 streak freezes a month: miss a day (or a week, with a weekly goal) without losing your streak. The history calendar shows your past year instead of 3 months. Your streak history is kept in your account, so it survives reinstalls and site moves, and several sites can share one streak.
+Connect your site to Inkmeter Pro under **Settings → Inkmeter** to get an email at the hour you choose when your goal needs a post today, before your streak breaks, and 2 streak freezes a month: miss a day (or a week, with a weekly goal) without losing your streak. The history calendar shows your past year instead of 3 months, and a weekly email recaps the days you wrote. Your streak history is kept in your account, so it survives reinstalls and site moves, and several sites can share one streak.
 
 Inkmeter Pro is a paid subscription, monthly or yearly, that starts with a 14-day free trial. Everything above works without it, and nothing is sent anywhere unless you connect.
 

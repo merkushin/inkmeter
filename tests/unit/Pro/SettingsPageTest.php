@@ -355,6 +355,39 @@ class SettingsPageTest extends TestCase {
 		$this->create_page()->reminders();
 	}
 
+	public function testReminders_WithRecaps_SavesTheRecapToo(): void {
+		$this->connection->connect(
+			'sfs_token',
+			'writer@example.com',
+			[
+				'plan'     => 'pro',
+				'features' => [ 'reminders', 'recaps' ],
+			]
+		);
+		$_POST = [ 'reminder_hour' => '7' ];
+		$this->api
+			->expects( $this->once() )
+			->method( 'request' )
+			->with(
+				'PATCH',
+				'/v1/settings',
+				'sfs_token',
+				[
+					'reminder_enabled' => false,
+					'reminder_hour'    => 7,
+					'recap_enabled'    => false,
+				]
+			)
+			->willReturn(
+				[
+					'status' => 200,
+					'data'   => [],
+				]
+			);
+
+		$this->create_page()->reminders();
+	}
+
 	public function testUpgrade_CheckoutAvailable_OpensIt(): void {
 		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
 		$this->api->method( 'request' )->with( 'POST', '/v1/checkout', 'sfs_token' )->willReturn(
@@ -518,6 +551,31 @@ class SettingsPageTest extends TestCase {
 		$this->assertStringContainsString( 'value="inkmeter_manage"', $html );
 		$this->assertStringNotContainsString( 'value="inkmeter_upgrade"', $html );
 		$this->assertTrue( $this->connection->has_feature( Connection::FEATURE_REMINDERS ), 'entitlements are refreshed' );
+	}
+
+	public function testRender_ProWithRecaps_ShowsTheRecapSetting(): void {
+		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
+		$this->api_returns(
+			[
+				'/v1/entitlements' => [
+					'plan'     => 'pro',
+					'features' => [ 'reminders', 'recaps' ],
+				],
+				'/v1/settings'     => [
+					'reminder_enabled' => false,
+					'reminder_hour'    => 7,
+					'recap_enabled'    => true,
+					'timezone'         => 'America/Mexico_City',
+				],
+				'/v1/streak'       => [ 'current' => 3 ],
+			]
+		);
+
+		$html = $this->render();
+
+		$this->assertStringContainsString( 'Email writer@example.com a recap of my writing week', $html );
+		$this->assertStringContainsString( 'name="recap_enabled" value="1" checked=\'checked\'', $html );
+		$this->assertStringContainsString( 'name="reminder_enabled" value="1" />', $html );
 	}
 
 	public function testRender_ProWithWeeklyGoal_ShowsWeeksAndFreezes(): void {

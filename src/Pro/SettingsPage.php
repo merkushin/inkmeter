@@ -276,6 +276,10 @@ class SettingsPage {
 			'reminder_enabled' => '1' === $this->input( $_POST, 'reminder_enabled' ), // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked by authorize(); sanitized by input().
 			'reminder_hour'    => max( 0, min( 23, $hour ) ),
 		];
+		// Only when the form had the checkbox: an unchecked box sends nothing, like a missing one.
+		if ( $this->connection->has_feature( Connection::FEATURE_RECAPS ) ) {
+			$body['recap_enabled'] = '1' === $this->input( $_POST, 'recap_enabled' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked by authorize(); sanitized by input().
+		}
 
 		$response = $this->call( 'PATCH', '/v1/settings', $body );
 		if ( null !== $response ) {
@@ -366,6 +370,8 @@ class SettingsPage {
 		$freezes_left     = $this->connection->has_feature( Connection::FEATURE_FREEZES ) ? $this->connection->freezes_left() : null;
 		$reminder_enabled = (bool) ( $settings['reminder_enabled'] ?? true );
 		$reminder_hour    = (int) ( $settings['reminder_hour'] ?? 19 );
+		$has_recaps       = $this->connection->has_feature( Connection::FEATURE_RECAPS );
+		$recap_enabled    = (bool) ( $settings['recap_enabled'] ?? true );
 		$timezone         = (string) $this->dates->wp_timezone_string();
 		$synced_at        = $this->connection->last_synced_at();
 		$synced_ago       = null === $synced_at ? null : (string) $this->dates->human_time_diff( $synced_at, time() );
@@ -400,7 +406,7 @@ class SettingsPage {
 		$notices = [
 			'connected'           => [ 'success', __( 'Your site is connected to Inkmeter.', 'inkmeter' ) ],
 			'disconnected'        => [ 'success', __( 'Your site is disconnected from Inkmeter. Your streak history is kept in your account.', 'inkmeter' ) ],
-			'saved'               => [ 'success', __( 'Reminder settings saved.', 'inkmeter' ) ],
+			'saved'               => [ 'success', __( 'Email settings saved.', 'inkmeter' ) ],
 			'connect_failed'      => [ 'error', __( 'Connecting didn\'t work. The link may have expired; please try again.', 'inkmeter' ) ],
 			'revoked'             => [ 'warning', __( 'This site is no longer connected to Inkmeter. Connect it again to keep using Pro.', 'inkmeter' ) ],
 			'unreachable'         => [ 'error', __( 'Inkmeter couldn\'t be reached. Please try again in a minute.', 'inkmeter' ) ],

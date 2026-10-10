@@ -140,11 +140,12 @@ function wp_remote_request( $url, $args = [] ): array {
 		],
 		'/v1/entitlements' => [
 			'plan'     => 'pro',
-			'features' => [ 'reminders', 'freezes' ],
+			'features' => [ 'reminders', 'freezes', 'recaps' ],
 		],
 		'/v1/settings'     => [
 			'reminder_enabled' => true,
 			'reminder_hour'    => 19,
+			'recap_enabled'    => true,
 		],
 		'/v1/streak'       => [
 			'current'      => 3,
@@ -442,7 +443,7 @@ if ( [ 'PUT https://api.streakfire.org/v1/days' ] !== $GLOBALS['smoke_requests']
 ob_start();
 smoke_do( 'smoke_render_settings' );
 $settings_page = trim( (string) preg_replace( '/\s+/', ' ', strip_tags( (string) ob_get_clean() ) ) );
-foreach ( [ 'writer@example.com', 'Pro', 'Streak in your account 3 days', 'Streak freezes 1 left this month', 'Last synced 1 min ago', 'Manage subscription' ] as $expected ) {
+foreach ( [ 'writer@example.com', 'Pro', 'Streak in your account 3 days', 'Streak freezes 1 left this month', 'Last synced 1 min ago', 'a recap of my writing week', 'Save email settings', 'Manage subscription' ] as $expected ) {
 	if ( false === strpos( $settings_page, $expected ) ) {
 		smoke_fail( "settings page is missing \"{$expected}\": {$settings_page}" );
 	}
