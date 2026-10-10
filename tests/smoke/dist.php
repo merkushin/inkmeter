@@ -238,7 +238,24 @@ function plugin_dir_url( string $file ): string {
 }
 
 function get_current_screen() {
-	return (object) [ 'id' => 'edit-post' ];
+	return (object) [
+		'id'        => 'edit-post',
+		'post_type' => 'post',
+	];
+}
+
+function wp_add_inline_script( string $handle, string $data, string $position = 'after' ): bool {
+	$GLOBALS['smoke_inline'][ $handle ] = $data;
+	return true;
+}
+
+function wp_set_script_translations( $handle, $domain = 'default', $path = '' ): bool {
+	return true;
+}
+
+function register_rest_route( $route_namespace, $route, $args = [], $override = false ): bool {
+	$GLOBALS['smoke_routes'][ $route_namespace . $route ] = $args;
+	return true;
 }
 
 function wp_enqueue_style( string $handle, string $src = '' ): void {
@@ -334,7 +351,7 @@ if ( ! isset( $GLOBALS['smoke_actions']['init'], $GLOBALS['smoke_actions']['deac
 }
 smoke_do( 'init' );
 
-foreach ( [ 'admin_enqueue_scripts', 'all_admin_notices', 'screen_settings', 'save_post', 'delete_post', 'admin_menu', 'inkmeter_sync_days', 'inkmeter_sync_days_daily', 'admin_post_inkmeter_connect', 'admin_post_inkmeter_goal' ] as $hook ) {
+foreach ( [ 'admin_enqueue_scripts', 'all_admin_notices', 'screen_settings', 'save_post', 'delete_post', 'admin_menu', 'inkmeter_sync_days', 'inkmeter_sync_days_daily', 'admin_post_inkmeter_connect', 'admin_post_inkmeter_goal', 'enqueue_block_editor_assets', 'rest_api_init' ] as $hook ) {
 	if ( ! isset( $GLOBALS['smoke_actions'][ $hook ] ) ) {
 		smoke_fail( "no callback for {$hook}" );
 	}
@@ -370,6 +387,18 @@ foreach ( [ 'Publish on 2 days a week', 'This week 1 of 2 days', '1 more day thi
 }
 unset( $GLOBALS['smoke_options']['inkmeter_goal'] );
 $GLOBALS['smoke_transients'] = [];
+
+// The block editor: the streak script with its settings, and the REST route it refreshes from.
+$GLOBALS['smoke_enqueued'] = [];
+smoke_do( 'enqueue_block_editor_assets' );
+if ( [ 'https://example.com/wp-content/plugins/inkmeter/assets/dist/javascript/editor.js' ] !== $GLOBALS['smoke_enqueued'] || false === strpos( $GLOBALS['smoke_inline']['inkmeter-editor'] ?? '', '"path":"\/inkmeter\/v1\/streak"' ) ) {
+	smoke_fail( 'the editor script or its settings are missing' );
+}
+smoke_do( 'rest_api_init' );
+$route = $GLOBALS['smoke_routes']['inkmeter/v1/streak'] ?? null;
+if ( null === $route || 3 !== ( $route['callback'] )()['streak'] ) {
+	smoke_fail( 'the streak REST route is missing or wrong' );
+}
 
 $screen_settings = (string) smoke_do( 'screen_settings', '', get_current_screen() );
 if ( false === strpos( $screen_settings, 'id="inkmeter-panel-toggle"' ) ) {

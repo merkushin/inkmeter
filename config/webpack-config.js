@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const config = {
   // Entry points. The keys replace the [name] portion of the output config below.
@@ -7,7 +8,8 @@ const config = {
     admin: [
       './assets/javascript/admin/index.js',
       './assets/styles/admin/index.css'
-    ]
+    ],
+    editor: './assets/javascript/editor/index.js'
   },
 
   // Output files: one for each of our entry points.
@@ -36,6 +38,19 @@ const config = {
           'css-loader'
         ]
       }
+    ]
+  },
+
+  // Keep the @wordpress/i18n function names: translate.wordpress.org finds the
+  // strings in the built files by looking for these calls.
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+        terserOptions: {
+          mangle: { reserved: ['__', '_n', '_x', '_nx'] }
+        }
+      })
     ]
   },
 

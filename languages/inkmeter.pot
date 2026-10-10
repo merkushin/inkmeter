@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-10T18:17:00+00:00\n"
+"POT-Creation-Date: 2026-10-10T18:28:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: inkmeter\n"
@@ -42,12 +42,12 @@ msgstr ""
 msgid "Sorry, you are not allowed to change the writing goal."
 msgstr ""
 
-#: src/Plugin.php:274
+#: src/Plugin.php:281
 msgid "Publish every day"
 msgstr ""
 
 #. translators: %s: Number of days.
-#: src/Plugin.php:278
+#: src/Plugin.php:285
 #, php-format
 msgid "Publish on %s day a week"
 msgid_plural "Publish on %s days a week"
@@ -55,19 +55,19 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: A date.
-#: src/Plugin.php:309
+#: src/Plugin.php:316
 #, php-format
 msgid "%s: published"
 msgstr ""
 
 #. translators: %s: A date.
-#: src/Plugin.php:312
+#: src/Plugin.php:319
 #, php-format
 msgid "%s: covered by a streak freeze"
 msgstr ""
 
 #. translators: %s: A date.
-#: src/Plugin.php:317
+#: src/Plugin.php:324
 #, php-format
 msgid "%s: no post"
 msgstr ""
@@ -468,3 +468,143 @@ msgstr ""
 #: src/views/streak_panel.php:211
 msgid "No post"
 msgstr ""
+
+#: assets/javascript/editor/messages.js:17
+msgid "Writing streak"
+msgstr ""
+
+#: assets/javascript/editor/messages.js:29
+msgid "Scheduled posts count toward your streak on the day they are published."
+msgstr ""
+
+#. translators: %s: Number of weeks.
+#: assets/javascript/editor/messages.js:36
+#, js-format
+msgid "This week's goal is already met. Your streak is %s week."
+msgid_plural "This week's goal is already met. Your streak is %s weeks."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Days with a post so far this week. 2: Days the weekly goal asks for.
+#: assets/javascript/editor/messages.js:43
+#, js-format
+msgid "You already published today, so this post doesn't add a day: %1$s of %2$s day this week."
+msgid_plural "You already published today, so this post doesn't add a day: %1$s of %2$s days this week."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Number of weeks.
+#: assets/javascript/editor/messages.js:52
+#, js-format
+msgid "This post meets this week's goal: %s week in a row."
+msgid_plural "This post meets this week's goal: %s weeks in a row."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Days with a post this week, counting this one. 2: Days the weekly goal asks for.
+#: assets/javascript/editor/messages.js:58
+#, js-format
+msgid "This post makes it %1$s of %2$s day this week."
+msgid_plural "This post makes it %1$s of %2$s days this week."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Number of days.
+#: assets/javascript/editor/messages.js:67
+#, js-format
+msgid "You already published today. Your streak is %s day."
+msgid_plural "You already published today. Your streak is %s days."
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/javascript/editor/messages.js:72
+msgid "Publishing this today starts a new streak."
+msgstr ""
+
+#. translators: %s: Number of days.
+#: assets/javascript/editor/messages.js:76
+#, js-format
+msgid "Publishing this today keeps your streak going: %s day in a row."
+msgid_plural "Publishing this today keeps your streak going: %s days in a row."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Days with a post so far this week. 2: Days the weekly goal asks for.
+#: assets/javascript/editor/messages.js:91
+#, js-format
+msgid "%1$s of %2$s day this week"
+msgid_plural "%1$s of %2$s days this week"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Streak in weeks, e.g. "6-week streak". 2: This week's progress, e.g. "2 of 3 days this week".
+#: assets/javascript/editor/messages.js:100
+#, js-format
+msgid "%1$s · %2$s"
+msgstr ""
+
+#. translators: %s: Number of weeks.
+#: assets/javascript/editor/messages.js:103
+#, js-format
+msgid "%s-week streak"
+msgid_plural "%s-week streak"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/javascript/editor/messages.js:111
+msgid "Publish today to start a streak"
+msgstr ""
+
+#. translators: %s: Number of days.
+#: assets/javascript/editor/messages.js:115
+#, js-format
+msgid "%s-day streak"
+msgid_plural "%s-day streak"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Streak in days, e.g. "7-day streak".
+#: assets/javascript/editor/messages.js:123
+#, js-format
+msgid "%s · publish today to keep it"
+msgstr ""
+
+#. translators: 1: Number of weeks. 2: Next milestone in weeks.
+#: assets/javascript/editor/messages.js:146
+#, js-format
+msgid "%1$s week in a row! Next milestone: %2$s weeks."
+msgid_plural "%1$s weeks in a row! Next milestone: %2$s weeks."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Number of days. 2: Next milestone in days.
+#: assets/javascript/editor/messages.js:152
+#, js-format
+msgid "%1$s day in a row! Next milestone: %2$s days."
+msgid_plural "%1$s days in a row! Next milestone: %2$s days."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Number of weeks.
+#: assets/javascript/editor/messages.js:163
+#, js-format
+msgid "This week's goal is met: %s week in a row."
+msgid_plural "This week's goal is met: %s weeks in a row."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Number of days.
+#: assets/javascript/editor/messages.js:168
+#, js-format
+msgid "Your streak is now %s day."
+msgid_plural "Your streak is now %s days."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Days with a post this week. 2: Days the weekly goal asks for.
+#: assets/javascript/editor/messages.js:179
+#, js-format
+msgid "%1$s of %2$s day this week."
+msgid_plural "%1$s of %2$s days this week."
+msgstr[0] ""
+msgstr[1] ""

@@ -98,7 +98,12 @@ class Plugin {
 	 */
 	private $pro;
 
-	public function __construct( string $plugin_file, ?Streak $streak = null, ?GoalForm $goal_form = null, ?Pro $pro = null ) {
+	/**
+	 * @var Editor
+	 */
+	private $editor;
+
+	public function __construct( string $plugin_file, ?Streak $streak = null, ?GoalForm $goal_form = null, ?Pro $pro = null, ?Editor $editor = null ) {
 		$this->plugin_file   = $plugin_file;
 		$this->hooks         = ServiceFactory::create_hooks();
 		$this->assets        = ServiceFactory::create_assets();
@@ -111,6 +116,7 @@ class Plugin {
 		$this->streak        = $streak ?? new Streak();
 		$this->goal_form     = $goal_form ?? new GoalForm( $this->streak );
 		$this->pro           = $pro ?? new Pro( self::VERSION );
+		$this->editor        = $editor ?? new Editor( $this->streak, $plugin_file, self::VERSION );
 	}
 
 	public function init(): void {
@@ -122,6 +128,7 @@ class Plugin {
 		$this->streak->init();
 		$this->goal_form->init();
 		$this->pro->init();
+		$this->editor->init();
 	}
 
 	public function enqueue_admin_assets(): void {
