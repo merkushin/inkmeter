@@ -47,19 +47,18 @@ version-check:
 	if [ -n "$(TAG)" ] && [ "$(patsubst v%,%,$(TAG))" != "$$version" ]; then echo "Tag $(TAG) does not match version $$version"; exit 1; fi; \
 	echo "Version $$version"
 
-# Regenerates languages/$(PLUGIN).pot from the sources and merges it into every .po file.
-# Run after changing translatable strings, then translate the new entries.
+# Generates the translation template build/$(PLUGIN).pot from the sources (needs WP-CLI).
+# It isn't committed: translate.wordpress.org builds its own template from the released code.
 i18n:
-	$(WP) i18n make-pot . languages/$(PLUGIN).pot $(POT_ARGS)
-	$(WP) i18n update-po languages/$(PLUGIN).pot languages
-
-# Fails when languages/$(PLUGIN).pot is out of date with the sources (ignores the creation date).
-i18n-check:
 	mkdir -p build
 	$(WP) i18n make-pot . build/$(PLUGIN).pot $(POT_ARGS)
-	grep -v '^"POT-Creation-Date:' languages/$(PLUGIN).pot > build/expected.pot
-	grep -v '^"POT-Creation-Date:' build/$(PLUGIN).pot > build/actual.pot
-	diff -u build/expected.pot build/actual.pot || (echo "languages/$(PLUGIN).pot is out of date, run 'make i18n'." && exit 1)
+
+# Fails on make-pot warnings, such as a string with placeholders but no translators comment.
+i18n-check:
+	mkdir -p build
+	@$(WP) i18n make-pot . build/$(PLUGIN).pot $(POT_ARGS) > build/i18n.log 2>&1; status=$$?; \
+	cat build/i18n.log; \
+	if [ $$status -ne 0 ] || grep -q '^Warning:' build/i18n.log; then echo "Fix the translatable strings above."; exit 1; fi
 
 # Builds a release zip in a separate directory, so the working copy is never modified:
 # copies the plugin files, installs runtime dependencies, keeps only
