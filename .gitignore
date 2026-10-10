@@ -5,5 +5,3 @@ vendor-prefixed
 build
 *.zip
 .phpunit.result.cache
-languages/*.mo
-languages/*.l10n.php
