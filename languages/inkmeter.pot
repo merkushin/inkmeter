@@ -9,17 +9,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-10T13:24:02+00:00\n"
+"POT-Creation-Date: 2026-10-10T17:33:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: inkmeter\n"
 
 #. Plugin Name of the plugin
 #: inkmeter.php
-#: src/Pro/SettingsPage.php:167
-#: src/Pro/SettingsPage.php:168
+#: src/Pro/SettingsPage.php:172
+#: src/Pro/SettingsPage.php:173
 #: src/views/screen_option.php:11
-#: src/views/settings_page.php:28
+#: src/views/settings_page.php:29
 msgid "Inkmeter"
 msgstr ""
 
@@ -54,39 +54,51 @@ msgid_plural "Publish on %s days a week"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Pro/SettingsPage.php:366
+#. translators: %s: Yearly price, e.g. "$50/year".
+#: src/Pro/SettingsPage.php:305
+#, php-format
+msgid "Yearly, %s (2 months free)"
+msgstr ""
+
+#. translators: %s: Monthly price, e.g. "$5/month".
+#: src/Pro/SettingsPage.php:307
+#, php-format
+msgid "Monthly, %s"
+msgstr ""
+
+#: src/Pro/SettingsPage.php:401
 msgid "Your site is connected to Inkmeter."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:367
+#: src/Pro/SettingsPage.php:402
 msgid "Your site is disconnected from Inkmeter. Your streak history is kept in your account."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:368
+#: src/Pro/SettingsPage.php:403
 msgid "Reminder settings saved."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:369
+#: src/Pro/SettingsPage.php:404
 msgid "Connecting didn't work. The link may have expired; please try again."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:370
+#: src/Pro/SettingsPage.php:405
 msgid "This site is no longer connected to Inkmeter. Connect it again to keep using Pro."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:371
+#: src/Pro/SettingsPage.php:406
 msgid "Inkmeter couldn't be reached. Please try again in a minute."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:372
+#: src/Pro/SettingsPage.php:407
 msgid "Billing isn't available right now. Please try again later."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:373
+#: src/Pro/SettingsPage.php:408
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: src/Pro/SettingsPage.php:439
+#: src/Pro/SettingsPage.php:500
 msgid "Sorry, you are not allowed to manage Inkmeter."
 msgstr ""
 
@@ -94,62 +106,62 @@ msgstr ""
 msgid "Writing streak panel"
 msgstr ""
 
-#: src/views/settings_page.php:35
+#: src/views/settings_page.php:36
 msgid "Inkmeter Pro"
 msgstr ""
 
-#: src/views/settings_page.php:36
+#: src/views/settings_page.php:37
 msgid "Never lose a streak by accident. With Inkmeter Pro:"
 msgstr ""
 
-#: src/views/settings_page.php:38
+#: src/views/settings_page.php:39
 msgid "You get an email at the hour you choose when you haven't published yet that day."
 msgstr ""
 
-#: src/views/settings_page.php:39
+#: src/views/settings_page.php:40
 msgid "Your streak history is kept in your Inkmeter account, so it survives reinstalls and site moves."
 msgstr ""
 
 #. translators: %s: Link to Inkmeter's privacy policy.
-#: src/views/settings_page.php:45
+#: src/views/settings_page.php:46
 #, php-format
 msgid "Connecting sends Inkmeter this site's address, its timezone and the dates you published on, never your posts. Nothing is sent until you connect. %s"
 msgstr ""
 
-#: src/views/settings_page.php:46
+#: src/views/settings_page.php:47
 msgid "Privacy policy"
 msgstr ""
 
-#: src/views/settings_page.php:53
+#: src/views/settings_page.php:54
 msgid "Connect to Inkmeter"
 msgstr ""
 
-#: src/views/settings_page.php:57
+#: src/views/settings_page.php:58
 msgid "Inkmeter couldn't be reached, so some details are missing. Please reload the page in a minute."
 msgstr ""
 
-#: src/views/settings_page.php:62
+#: src/views/settings_page.php:63
 msgid "Account"
 msgstr ""
 
-#: src/views/settings_page.php:66
+#: src/views/settings_page.php:67
 msgid "Plan"
 msgstr ""
 
-#: src/views/settings_page.php:67
+#: src/views/settings_page.php:68
 msgid "Pro"
 msgstr ""
 
-#: src/views/settings_page.php:67
+#: src/views/settings_page.php:68
 msgid "Free"
 msgstr ""
 
-#: src/views/settings_page.php:71
+#: src/views/settings_page.php:72
 msgid "Streak in your account"
 msgstr ""
 
 #. translators: %s: Number of weeks.
-#: src/views/settings_page.php:76
+#: src/views/settings_page.php:77
 #: src/views/streak_panel.php:99
 #: src/views/streak_panel.php:129
 #, php-format
@@ -159,7 +171,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: Number of days.
-#: src/views/settings_page.php:79
+#: src/views/settings_page.php:80
 #: src/views/streak_panel.php:102
 #: src/views/streak_panel.php:132
 #, php-format
@@ -168,84 +180,99 @@ msgid_plural "%s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/settings_page.php:87
+#: src/views/settings_page.php:88
 msgid "Streak freezes"
 msgstr ""
 
 #. translators: %s: Number of streak freezes.
-#: src/views/settings_page.php:91
+#: src/views/settings_page.php:92
 #, php-format
 msgid "%s left this month"
 msgid_plural "%s left this month"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/settings_page.php:93
+#: src/views/settings_page.php:94
 msgid "If you miss a day (or a week, with a weekly goal), a freeze keeps your streak going. You get 2 each month."
 msgstr ""
 
-#: src/views/settings_page.php:98
+#: src/views/settings_page.php:99
 msgid "Last synced"
 msgstr ""
 
-#: src/views/settings_page.php:102
+#: src/views/settings_page.php:103
 msgid "Not yet"
 msgstr ""
 
 #. translators: %s: Time since the last sync, e.g. "5 mins".
-#: src/views/settings_page.php:105
+#: src/views/settings_page.php:106
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: src/views/settings_page.php:113
+#: src/views/settings_page.php:114
 msgid "Reminders"
 msgstr ""
 
-#: src/views/settings_page.php:119
+#: src/views/settings_page.php:120
 msgid "Email reminder"
 msgstr ""
 
 #. translators: %s: Account email address.
-#: src/views/settings_page.php:125
+#: src/views/settings_page.php:126
 #, php-format
 msgid "Email %s when I haven't published yet"
 msgstr ""
 
-#: src/views/settings_page.php:131
+#: src/views/settings_page.php:132
 msgid "Send it at"
 msgstr ""
 
 #. translators: %s: The site's timezone, e.g. "America/Mexico_City".
-#: src/views/settings_page.php:139
+#: src/views/settings_page.php:140
 #, php-format
 msgid "In your site's timezone (%s)."
 msgstr ""
 
-#: src/views/settings_page.php:145
+#: src/views/settings_page.php:146
 msgid "Save reminders"
 msgstr ""
 
-#: src/views/settings_page.php:151
+#: src/views/settings_page.php:152
 msgid "Manage subscription"
 msgstr ""
 
-#: src/views/settings_page.php:154
+#. translators: %s: Number of days.
 #: src/views/settings_page.php:159
-msgid "Upgrade to Pro"
+#, php-format
+msgid "Try Inkmeter Pro free for %s day"
+msgid_plural "Try Inkmeter Pro free for %s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/views/settings_page.php:161
+msgid "Upgrade to Inkmeter Pro"
 msgstr ""
 
-#: src/views/settings_page.php:155
+#: src/views/settings_page.php:165
 msgid "Get an email at the hour you choose when you haven't published yet that day."
 msgstr ""
 
-#: src/views/settings_page.php:163
-#: src/views/settings_page.php:173
+#: src/views/settings_page.php:167
+msgid "Inkmeter Pro can't be bought just yet. Please check back soon."
+msgstr ""
+
+#: src/views/settings_page.php:170
+msgid "Cancel before the trial ends and you won't be charged."
+msgstr ""
+
+#: src/views/settings_page.php:180
+#: src/views/settings_page.php:190
 msgid "Disconnect"
 msgstr ""
 
 #. translators: %s: This site's address.
-#: src/views/settings_page.php:167
+#: src/views/settings_page.php:184
 #, php-format
 msgid "Stops sending %s's publishing days to Inkmeter. Your streak history stays in your account, and connecting again picks it up."
 msgstr ""

@@ -18,6 +18,7 @@
  * @var string      $site_url         This site's address.
  * @var string      $privacy_url      Inkmeter's privacy policy.
  * @var string      $action_url       admin-post.php.
+ * @var array{trial_days: int, plans: array<int, array{id: string, price: string}>} $offer What Inkmeter Pro costs; plans is empty when it can't be bought yet.
  * @var \Merkushin\Inkmeter\Pro\SettingsPage $this
  */
 
@@ -151,13 +152,29 @@ defined( 'ABSPATH' ) || exit;
 				<p><button type="submit" class="button"><?php esc_html_e( 'Manage subscription', 'inkmeter' ); ?></button></p>
 			</form>
 		<?php else : ?>
-			<h2><?php esc_html_e( 'Upgrade to Pro', 'inkmeter' ); ?></h2>
+			<h2>
+				<?php
+				if ( $offer['trial_days'] > 0 ) {
+					/* translators: %s: Number of days. */
+					echo esc_html( sprintf( _n( 'Try Inkmeter Pro free for %s day', 'Try Inkmeter Pro free for %s days', $offer['trial_days'], 'inkmeter' ), (string) $offer['trial_days'] ) );
+				} else {
+					esc_html_e( 'Upgrade to Inkmeter Pro', 'inkmeter' );
+				}
+				?>
+			</h2>
 			<p><?php esc_html_e( 'Get an email at the hour you choose when you haven\'t published yet that day.', 'inkmeter' ); ?></p>
-			<form method="post" action="<?php echo esc_url( $action_url ); ?>">
-				<input type="hidden" name="action" value="inkmeter_upgrade" />
-				<?php wp_nonce_field( 'inkmeter_upgrade' ); ?>
-				<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Upgrade to Pro', 'inkmeter' ); ?></button></p>
-			</form>
+			<?php if ( [] === $offer['plans'] ) : ?>
+				<p><?php esc_html_e( 'Inkmeter Pro can\'t be bought just yet. Please check back soon.', 'inkmeter' ); ?></p>
+			<?php else : ?>
+				<?php if ( $offer['trial_days'] > 0 ) : ?>
+					<p class="description"><?php esc_html_e( 'Cancel before the trial ends and you won\'t be charged.', 'inkmeter' ); ?></p>
+				<?php endif; ?>
+				<form method="post" action="<?php echo esc_url( $action_url ); ?>">
+					<input type="hidden" name="action" value="inkmeter_upgrade" />
+					<?php wp_nonce_field( 'inkmeter_upgrade' ); ?>
+					<p><?php $this->render_plan_buttons( $offer['plans'] ); ?></p>
+				</form>
+			<?php endif; ?>
 		<?php endif; ?>
 
 		<h2><?php esc_html_e( 'Disconnect', 'inkmeter' ); ?></h2>

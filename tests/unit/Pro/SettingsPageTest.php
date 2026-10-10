@@ -369,6 +369,62 @@ class SettingsPageTest extends TestCase {
 		$this->assertSame( [ 'away:https://inkmeter.lemonsqueezy.com/buy/abc?checkout[custom][account_id]=1' ], $this->redirects );
 	}
 
+	public function testUpgrade_YearlyChosen_ChecksOutYearly(): void {
+		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
+		$_POST = [ 'plan' => 'yearly' ];
+		$this->api
+			->expects( $this->once() )
+			->method( 'request' )
+			->with( 'POST', '/v1/checkout', 'sfs_token', [ 'plan' => 'yearly' ] )
+			->willReturn(
+				[
+					'status' => 200,
+					'data'   => [ 'url' => 'https://inkmeter.lemonsqueezy.com/buy/yearly' ],
+				]
+			);
+
+		$this->create_page()->upgrade();
+
+		$this->assertSame( [ 'away:https://inkmeter.lemonsqueezy.com/buy/yearly' ], $this->redirects );
+	}
+
+	public function testUpgrade_UnknownPlan_ChecksOutMonthly(): void {
+		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
+		$_POST = [ 'plan' => 'lifetime' ];
+		$this->api->expects( $this->once() )->method( 'request' )->with( 'POST', '/v1/checkout', 'sfs_token', [ 'plan' => 'monthly' ] );
+
+		$this->create_page()->upgrade();
+	}
+
+	public function testRender_NothingOnSaleYet_SaysSo(): void {
+		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
+		$this->api_returns(
+			[
+				'/v1/entitlements' => [
+					'plan'     => 'free',
+					'features' => [],
+				],
+				'/v1/settings'     => [],
+				'/v1/streak'       => [ 'current' => 0 ],
+				'/v1/plans'        => [
+					'trial_days' => 14,
+					'plans'      => [
+						[
+							'id'        => 'monthly',
+							'price'     => '$5/month',
+							'available' => false,
+						],
+					],
+				],
+			]
+		);
+
+		$html = $this->render();
+
+		$this->assertStringContainsString( 'can&#039;t be bought just yet', $html );
+		$this->assertStringNotContainsString( 'name="plan"', $html );
+	}
+
 	public function testUpgrade_BillingNotConfigured_ReportsIt(): void {
 		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
 		$this->api->method( 'request' )->willReturn(
@@ -499,12 +555,31 @@ class SettingsPageTest extends TestCase {
 				],
 				'/v1/settings'     => [],
 				'/v1/streak'       => [ 'current' => 0 ],
+				'/v1/plans'        => [
+					'trial_days' => 14,
+					'plans'      => [
+						[
+							'id'        => 'monthly',
+							'price'     => '$5/month',
+							'available' => true,
+						],
+						[
+							'id'        => 'yearly',
+							'price'     => '$50/year',
+							'note'      => '2 months free',
+							'available' => true,
+						],
+					],
+				],
 			]
 		);
 
 		$html = $this->render();
 
 		$this->assertStringContainsString( 'value="inkmeter_upgrade"', $html );
+		$this->assertStringContainsString( 'Try Inkmeter Pro free for 14 days', $html );
+		$this->assertStringContainsString( '<button type="submit" name="plan" value="monthly" class="button button-primary">Monthly, $5/month</button>', $html );
+		$this->assertStringContainsString( '<button type="submit" name="plan" value="yearly" class="button">Yearly, $50/year (2 months free)</button>', $html );
 		$this->assertStringNotContainsString( 'value="inkmeter_reminders"', $html );
 		$this->assertStringContainsString( 'value="inkmeter_disconnect"', $html );
 	}
