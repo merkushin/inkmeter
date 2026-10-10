@@ -25,7 +25,7 @@
  * @var int|null    $freezes_left         Inkmeter Pro streak freezes left this month; null without them.
  * @var string      $freezes_left_label   $freezes_left formatted for the locale.
  * @var bool        $saved_by_freeze      Whether a streak freeze covered yesterday (or last week) and kept the streak.
- * @var bool        $has_full_history     Whether the history calendar shows the past year (Inkmeter Pro) rather than 3 months.
+ * @var bool        $history_all_sites    Whether the calendar includes the account's other sites (Inkmeter Pro).
  * @var array<string, mixed> $history     HistoryCalendar::build() for the calendar.
  * @var string      $history_published    Days with a post shown in the calendar, formatted for the locale.
  * @var string      $history_days         Days shown in the calendar up to today, formatted for the locale.
@@ -192,13 +192,16 @@ defined( 'ABSPATH' ) || exit;
 	</div>
 	<div class="inkmeter-panel__history">
 		<div class="inkmeter-history__heading">
-			<span class="inkmeter-history__title"><?php echo esc_html( $has_full_history ? __( 'Past year', 'inkmeter' ) : __( 'Last 3 months', 'inkmeter' ) ); ?></span>
+			<span class="inkmeter-history__title"><?php esc_html_e( 'Past year', 'inkmeter' ); ?></span>
 			<span class="inkmeter-history__summary">
 				<?php
 				/* translators: 1: Days with a published post. 2: Days in the period shown. */
 				echo esc_html( sprintf( _n( 'Published on %1$s of %2$s day', 'Published on %1$s of %2$s days', (int) $history['days'], 'inkmeter' ), $history_published, $history_days ) );
 				?>
 			</span>
+			<?php if ( $history_all_sites ) : ?>
+				<span class="inkmeter-history__summary"><?php esc_html_e( 'Across all your connected sites', 'inkmeter' ); ?></span>
+			<?php endif; ?>
 		</div>
 		<div class="inkmeter-history__grid">
 			<?php $this->render_history( $history ); ?>

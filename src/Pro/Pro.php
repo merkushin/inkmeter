@@ -80,10 +80,14 @@ class Pro {
 	}
 
 	/**
-	 * Whether the history calendar shows the past year rather than 3 months.
+	 * The account's days with a post across all its sites, which the service
+	 * keeps through reinstalls and site moves, for the history calendar; null
+	 * without the history feature.
+	 *
+	 * @return string[]|null
 	 */
-	public function has_full_history(): bool {
-		return $this->connection->has_feature( Connection::FEATURE_HISTORY );
+	public function history_days(): ?array {
+		return $this->connection->has_feature( Connection::FEATURE_HISTORY ) ? $this->connection->history_days() : null;
 	}
 
 	/**

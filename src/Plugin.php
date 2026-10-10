@@ -30,11 +30,9 @@ class Plugin {
 	public const PANEL_SETTING = 'inkmeter_panel';
 
 	/**
-	 * Weeks in the history calendar: about 3 months, or a year with Inkmeter Pro.
+	 * Weeks in the history calendar: the past year.
 	 */
-	private const HISTORY_WEEKS = 13;
-
-	private const HISTORY_WEEKS_PRO = 53;
+	private const HISTORY_WEEKS = 53;
 
 	/**
 	 * Main plugin file path.
@@ -175,27 +173,29 @@ class Plugin {
 		$freezes_left         = $this->pro->freezes_left();
 		$freezes_left_label   = null === $freezes_left ? '' : $this->format_number( $freezes_left );
 		$saved_by_freeze      = (bool) ( $summary['saved_by_freeze'] ?? false );
-		$has_full_history     = $this->pro->has_full_history();
-		$history              = ( new HistoryCalendar() )->build(
-			(array) ( $summary['recent_days'] ?? [] ),
+		// With Inkmeter Pro, the account's days from all its sites join this site's own.
+		$account_days       = $this->pro->history_days();
+		$history_all_sites  = null !== $account_days;
+		$history            = ( new HistoryCalendar() )->build(
+			array_merge( (array) ( $summary['recent_days'] ?? [] ), $account_days ?? [] ),
 			(array) ( $summary['frozen'] ?? [] ),
 			$is_weekly,
 			(string) $this->dates->current_time( 'Y-m-d' ),
 			$this->streak->week_start(),
-			$has_full_history ? self::HISTORY_WEEKS_PRO : self::HISTORY_WEEKS
+			self::HISTORY_WEEKS
 		);
-		$history_published    = $this->format_number( $history['published'] );
-		$history_days         = $this->format_number( $history['days'] );
-		$history_has_frozen   = [] !== array_filter(
+		$history_published  = $this->format_number( $history['published'] );
+		$history_days       = $this->format_number( $history['days'] );
+		$history_has_frozen = [] !== array_filter(
 			$history['weeks'],
 			static function ( array $week ): bool {
 				return in_array( HistoryCalendar::FROZEN, array_column( $week['days'], 'state' ), true );
 			}
 		);
-		$goal                 = $this->streak->goal();
-		$goal_options         = Goal::all();
-		$can_change_goal      = $this->goal_form->can_change();
-		$goal_action_url      = $this->goal_form->action_url();
+		$goal               = $this->streak->goal();
+		$goal_options       = Goal::all();
+		$can_change_goal    = $this->goal_form->can_change();
+		$goal_action_url    = $this->goal_form->action_url();
 
 		include __DIR__ . '/views/streak_panel.php';
 	}

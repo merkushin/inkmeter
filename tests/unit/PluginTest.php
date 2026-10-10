@@ -410,31 +410,33 @@ class PluginTest extends TestCase {
 		$this->assertStringNotContainsString( 'inkmeter-panel__freezes', $this->render_panel() );
 	}
 
-	public function testRenderStreakPanel_History_ShowsThreeMonthsWithoutPro(): void {
+	public function testRenderStreakPanel_History_ShowsThePastYearWithoutPro(): void {
+		$this->pro->method( 'history_days' )->willReturn( null );
 		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
 		$this->dates->method( 'wp_date' )->willReturn( 'Mar 2' );
 		$html = $this->render_panel_with(
 			[
-				'recent_days' => [ '2026-03-02', '2026-03-03' ],
+				'recent_days' => [ '2025-04-01', '2026-03-02', '2026-03-03' ],
 				'frozen'      => [ '2026-03-04' ],
 			]
 		);
 
-		$this->assertSame( 13 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 3, '13 weeks of days, plus the legend' );
-		$this->assertStringContainsString( 'Last 3 months', $html );
-		$this->assertStringContainsString( 'Published on 2 of 88 days', $html );
+		$this->assertSame( 53 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 3, '53 weeks of days, plus the legend' );
+		$this->assertStringContainsString( 'Past year', $html );
+		$this->assertStringContainsString( 'Published on 3 of 368 days', $html );
 		$this->assertStringContainsString( 'class="inkmeter-history__day is-frozen" title="Mar 2: covered by a streak freeze"', $html );
 		$this->assertStringContainsString( 'Streak freeze', $html );
+		$this->assertStringNotContainsString( 'Across all your connected sites', $html );
 	}
 
-	public function testRenderStreakPanel_HistoryWithPro_ShowsThePastYear(): void {
-		$this->pro->method( 'has_full_history' )->willReturn( true );
+	public function testRenderStreakPanel_HistoryWithPro_AddsTheAccountsOtherSites(): void {
+		$this->pro->method( 'history_days' )->willReturn( [ '2026-03-01', '2026-03-03' ] );
 		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
 
-		$html = $this->render_panel_with( [ 'recent_days' => [] ] );
+		$html = $this->render_panel_with( [ 'recent_days' => [ '2026-03-03', '2026-03-05' ] ] );
 
-		$this->assertSame( 53 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 2, '53 weeks, plus the legend without freezes' );
-		$this->assertStringContainsString( 'Past year', $html );
+		$this->assertStringContainsString( 'Published on 3 of 368 days', $html, 'this site\'s days and the account\'s, counted once' );
+		$this->assertStringContainsString( 'Across all your connected sites', $html );
 	}
 
 	/**
