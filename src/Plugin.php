@@ -30,6 +30,13 @@ class Plugin {
 	public const PANEL_SETTING = 'inkmeter_panel';
 
 	/**
+	 * Weeks in the history calendar: about 3 months, or a year with Inkmeter Pro.
+	 */
+	private const HISTORY_WEEKS = 13;
+
+	private const HISTORY_WEEKS_PRO = 53;
+
+	/**
 	 * Main plugin file path.
 	 *
 	 * @var string
@@ -161,6 +168,23 @@ class Plugin {
 		$freezes_left         = $this->pro->freezes_left();
 		$freezes_left_label   = null === $freezes_left ? '' : $this->format_number( $freezes_left );
 		$saved_by_freeze      = (bool) ( $summary['saved_by_freeze'] ?? false );
+		$has_full_history     = $this->pro->has_full_history();
+		$history              = ( new HistoryCalendar() )->build(
+			(array) ( $summary['recent_days'] ?? [] ),
+			(array) ( $summary['frozen'] ?? [] ),
+			$is_weekly,
+			(string) $this->dates->current_time( 'Y-m-d' ),
+			$this->streak->week_start(),
+			$has_full_history ? self::HISTORY_WEEKS_PRO : self::HISTORY_WEEKS
+		);
+		$history_published    = $this->format_number( $history['published'] );
+		$history_days         = $this->format_number( $history['days'] );
+		$history_has_frozen   = [] !== array_filter(
+			$history['weeks'],
+			static function ( array $week ): bool {
+				return in_array( HistoryCalendar::FROZEN, array_column( $week['days'], 'state' ), true );
+			}
+		);
 		$goal                 = $this->streak->goal();
 		$goal_options         = Goal::all();
 		$can_change_goal      = $this->goal_form->can_change();
@@ -198,6 +222,34 @@ class Plugin {
 		$screen = $this->screen->get_current_screen();
 
 		return is_object( $screen ) && isset( $screen->id ) && self::SCREEN_ID === $screen->id;
+	}
+
+	/**
+	 * Prints the history calendar's grid: a column per week, a cell per day.
+	 *
+	 * @param array{weeks: array<int, array{month: ?string, days: array<int, array{date: string, state: string}>}>} $history
+	 */
+	public function render_history( array $history ): void {
+		$utc = new \DateTimeZone( 'UTC' );
+
+		echo '<div class="inkmeter-history__months" aria-hidden="true">';
+		foreach ( $history['weeks'] as $week ) {
+			$month = null === $week['month'] ? '' : (string) $this->dates->wp_date( 'M', (int) strtotime( $week['month'] . '-01 UTC' ), $utc );
+			echo '<span>' . esc_html( $month ) . '</span>';
+		}
+		echo '</div><div class="inkmeter-history__weeks" aria-hidden="true">';
+		foreach ( $history['weeks'] as $week ) {
+			echo '<div class="inkmeter-history__week">';
+			foreach ( $week['days'] as $day ) {
+				printf(
+					'<span class="inkmeter-history__day is-%1$s" title="%2$s"></span>',
+					esc_attr( $day['state'] ),
+					esc_attr( $this->history_title( $day['date'], $day['state'] ) )
+				);
+			}
+			echo '</div>';
+		}
+		echo '</div>';
 	}
 
 	/**
@@ -244,6 +296,26 @@ class Plugin {
 
 	private function format_number( int $number ): string {
 		return (string) $this->localization->number_format_i18n( $number );
+	}
+
+	/**
+	 * A day's tooltip in the history calendar, e.g. "March 3, 2026: published".
+	 */
+	private function history_title( string $date, string $state ): string {
+		$label = (string) $this->format_date( $date );
+		switch ( $state ) {
+			case HistoryCalendar::PUBLISHED:
+				/* translators: %s: A date. */
+				return sprintf( __( '%s: published', 'inkmeter' ), $label );
+			case HistoryCalendar::FROZEN:
+				/* translators: %s: A date. */
+				return sprintf( __( '%s: covered by a streak freeze', 'inkmeter' ), $label );
+			case HistoryCalendar::FUTURE:
+				return $label;
+			default:
+				/* translators: %s: A date. */
+				return sprintf( __( '%s: no post', 'inkmeter' ), $label );
+		}
 	}
 
 	/**

@@ -18,6 +18,7 @@ Inkmeter turns publishing into a habit. Open **Posts** in your dashboard and a p
 * **Last published**: the date of your latest post.
 * **Next milestone**: 3, 7, 14, 30, 50 and 100 days, then every 25 days, with a progress bar.
 * Whether you have already published today, or still need to post to keep the streak going.
+* **History**: a calendar of the last 3 months, with the days you published.
 
 A streak stays alive until the end of the day after your last post, so you always have a full day to keep it going. Days follow your site's timezone, and several posts on the same day count as one day.
 
@@ -29,7 +30,7 @@ There is nothing else to configure. The panel only appears on the Posts list scr
 
 = Inkmeter Pro (optional) =
 
-Connect your site to Inkmeter Pro under **Settings → Inkmeter** to get an email at the hour you choose when your goal needs a post today, before your streak breaks, and 2 streak freezes a month: miss a day (or a week, with a weekly goal) without losing your streak. Your streak history is kept in your account, so it survives reinstalls and site moves, and several sites can share one streak.
+Connect your site to Inkmeter Pro under **Settings → Inkmeter** to get an email at the hour you choose when your goal needs a post today, before your streak breaks, and 2 streak freezes a month: miss a day (or a week, with a weekly goal) without losing your streak. The history calendar shows your past year instead of 3 months. Your streak history is kept in your account, so it survives reinstalls and site moves, and several sites can share one streak.
 
 Inkmeter Pro is a paid subscription, monthly or yearly, that starts with a 14-day free trial. Everything above works without it, and nothing is sent anywhere unless you connect.
 

@@ -166,6 +166,8 @@ class StreakTest extends TestCase {
 						'days_left'       => 1,
 						'saved_by_freeze' => false,
 						'next_milestone'  => 3,
+						'recent_days'     => [ '2026-03-02', '2026-03-01' ],
+						'frozen'          => [],
 					],
 				],
 				$this->greaterThan( 0 )

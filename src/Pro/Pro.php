@@ -80,6 +80,13 @@ class Pro {
 	}
 
 	/**
+	 * Whether the history calendar shows the past year rather than 3 months.
+	 */
+	public function has_full_history(): bool {
+		return $this->connection->has_feature( Connection::FEATURE_HISTORY );
+	}
+
+	/**
 	 * Streak freezes left this month, or null without them.
 	 */
 	public function freezes_left(): ?int {

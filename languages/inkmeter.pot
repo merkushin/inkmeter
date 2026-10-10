@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-10T17:33:08+00:00\n"
+"POT-Creation-Date: 2026-10-10T18:17:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: inkmeter\n"
@@ -42,17 +42,35 @@ msgstr ""
 msgid "Sorry, you are not allowed to change the writing goal."
 msgstr ""
 
-#: src/Plugin.php:222
+#: src/Plugin.php:274
 msgid "Publish every day"
 msgstr ""
 
 #. translators: %s: Number of days.
-#: src/Plugin.php:226
+#: src/Plugin.php:278
 #, php-format
 msgid "Publish on %s day a week"
 msgid_plural "Publish on %s days a week"
 msgstr[0] ""
 msgstr[1] ""
+
+#. translators: %s: A date.
+#: src/Plugin.php:309
+#, php-format
+msgid "%s: published"
+msgstr ""
+
+#. translators: %s: A date.
+#: src/Plugin.php:312
+#, php-format
+msgid "%s: covered by a streak freeze"
+msgstr ""
+
+#. translators: %s: A date.
+#: src/Plugin.php:317
+#, php-format
+msgid "%s: no post"
+msgstr ""
 
 #. translators: %s: Yearly price, e.g. "$50/year".
 #: src/Pro/SettingsPage.php:305
@@ -162,8 +180,8 @@ msgstr ""
 
 #. translators: %s: Number of weeks.
 #: src/views/settings_page.php:77
-#: src/views/streak_panel.php:99
-#: src/views/streak_panel.php:129
+#: src/views/streak_panel.php:104
+#: src/views/streak_panel.php:134
 #, php-format
 msgid "%s week"
 msgid_plural "%s weeks"
@@ -172,8 +190,8 @@ msgstr[1] ""
 
 #. translators: %s: Number of days.
 #: src/views/settings_page.php:80
-#: src/views/streak_panel.php:102
-#: src/views/streak_panel.php:132
+#: src/views/streak_panel.php:107
+#: src/views/streak_panel.php:137
 #, php-format
 msgid "%s day"
 msgid_plural "%s days"
@@ -277,104 +295,104 @@ msgstr ""
 msgid "Stops sending %s's publishing days to Inkmeter. Your streak history stays in your account, and connecting again picks it up."
 msgstr ""
 
-#: src/views/streak_panel.php:38
+#: src/views/streak_panel.php:43
 msgid "Writing momentum"
 msgstr ""
 
-#: src/views/streak_panel.php:39
+#: src/views/streak_panel.php:44
 msgid "Protect the streak. Build the habit."
 msgstr ""
 
-#: src/views/streak_panel.php:43
+#: src/views/streak_panel.php:48
 msgid "Start your next streak"
 msgstr ""
 
-#: src/views/streak_panel.php:46
+#: src/views/streak_panel.php:51
 msgid "You met your goal this week"
 msgstr ""
 
-#: src/views/streak_panel.php:48
+#: src/views/streak_panel.php:53
 msgid "You are on fire today"
 msgstr ""
 
-#: src/views/streak_panel.php:51
+#: src/views/streak_panel.php:56
 msgid "Not enough days are left to meet this week's goal. A new streak starts next week."
 msgstr ""
 
 #. translators: %s: Number of days.
-#: src/views/streak_panel.php:54
+#: src/views/streak_panel.php:59
 #, php-format
 msgid "Publish on %s more day this week to keep it going"
 msgid_plural "Publish on %s more days this week to keep it going"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/streak_panel.php:56
+#: src/views/streak_panel.php:61
 msgid "You are still alive, publish today to keep it going"
 msgstr ""
 
-#: src/views/streak_panel.php:64
+#: src/views/streak_panel.php:69
 msgid "Change goal"
 msgstr ""
 
-#: src/views/streak_panel.php:68
+#: src/views/streak_panel.php:73
 msgid "Writing goal"
 msgstr ""
 
-#: src/views/streak_panel.php:72
+#: src/views/streak_panel.php:77
 msgid "Save goal"
 msgstr ""
 
-#: src/views/streak_panel.php:81
+#: src/views/streak_panel.php:86
 msgid "A streak freeze saved last week."
 msgstr ""
 
-#: src/views/streak_panel.php:81
+#: src/views/streak_panel.php:86
 msgid "A streak freeze saved yesterday."
 msgstr ""
 
 #. translators: %s: Number of streak freezes.
-#: src/views/streak_panel.php:85
+#: src/views/streak_panel.php:90
 #, php-format
 msgid "%s streak freeze left this month"
 msgid_plural "%s streak freezes left this month"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/streak_panel.php:90
+#: src/views/streak_panel.php:95
 msgid "Get an email before your streak breaks"
 msgstr ""
 
-#: src/views/streak_panel.php:94
+#: src/views/streak_panel.php:99
 msgid "Current run"
 msgstr ""
 
-#: src/views/streak_panel.php:109
+#: src/views/streak_panel.php:114
 msgid "This week"
 msgstr ""
 
 #. translators: 1: Days with a post so far this week. 2: Days the weekly goal asks for.
-#: src/views/streak_panel.php:113
+#: src/views/streak_panel.php:118
 #, php-format
 msgid "%1$s of %2$s day"
 msgid_plural "%1$s of %2$s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/streak_panel.php:119
+#: src/views/streak_panel.php:124
 msgid "Last published"
 msgstr ""
 
-#: src/views/streak_panel.php:120
+#: src/views/streak_panel.php:125
 msgid "No published posts yet"
 msgstr ""
 
-#: src/views/streak_panel.php:124
+#: src/views/streak_panel.php:129
 msgid "Next milestone"
 msgstr ""
 
 #. translators: Unit shown after the large streak number, e.g. "6 weeks".
-#: src/views/streak_panel.php:147
+#: src/views/streak_panel.php:152
 msgctxt "streak counter unit"
 msgid "week"
 msgid_plural "weeks"
@@ -382,43 +400,71 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: Unit shown after the large streak number, e.g. "12 days".
-#: src/views/streak_panel.php:150
+#: src/views/streak_panel.php:155
 msgctxt "streak counter unit"
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/streak_panel.php:160
+#: src/views/streak_panel.php:165
 msgid "Published today"
 msgstr ""
 
-#: src/views/streak_panel.php:160
+#: src/views/streak_panel.php:165
 msgid "Needs a post today"
 msgstr ""
 
-#: src/views/streak_panel.php:162
+#: src/views/streak_panel.php:167
 msgid "Goal met this week"
 msgstr ""
 
-#: src/views/streak_panel.php:164
+#: src/views/streak_panel.php:169
 msgid "Next week is a fresh start"
 msgstr ""
 
 #. translators: %s: Number of days.
-#: src/views/streak_panel.php:167
+#: src/views/streak_panel.php:172
 #, php-format
 msgid "%s more day this week"
 msgid_plural "%s more days this week"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/streak_panel.php:175
+#: src/views/streak_panel.php:180
 msgid "Milestone progress"
 msgstr ""
 
 #. translators: %s: Progress towards the next milestone, a number from 0 to 100.
-#: src/views/streak_panel.php:179
+#: src/views/streak_panel.php:184
 #, php-format
 msgid "%s%%"
+msgstr ""
+
+#: src/views/streak_panel.php:195
+msgid "Past year"
+msgstr ""
+
+#: src/views/streak_panel.php:195
+msgid "Last 3 months"
+msgstr ""
+
+#. translators: 1: Days with a published post. 2: Days in the period shown.
+#: src/views/streak_panel.php:199
+#, php-format
+msgid "Published on %1$s of %2$s day"
+msgid_plural "Published on %1$s of %2$s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/views/streak_panel.php:207
+msgid "Published"
+msgstr ""
+
+#: src/views/streak_panel.php:209
+msgid "Streak freeze"
+msgstr ""
+
+#: src/views/streak_panel.php:211
+msgid "No post"
 msgstr ""
