@@ -32,6 +32,11 @@ class SettingsPage {
 
 	public const ACTIONS = [ 'connect', 'disconnect', 'reminders', 'upgrade', 'manage' ];
 
+	/**
+	 * Plans the Upgrade buttons can ask the service to check out; the first is the default.
+	 */
+	private const PLANS = [ 'monthly', 'yearly' ];
+
 	private const CAPABILITY = 'manage_options';
 
 	private const STATE_TTL = 1800;
@@ -283,7 +288,30 @@ class SettingsPage {
 	 */
 	public function upgrade(): void {
 		$this->authorize( 'upgrade' );
-		$this->open_billing_link( 'POST', '/v1/checkout' );
+
+		$plan = $this->input( $_POST, 'plan' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked by authorize(); sanitized by input().
+		$this->open_billing_link( 'POST', '/v1/checkout', [ 'plan' => in_array( $plan, self::PLANS, true ) ? $plan : self::PLANS[0] ] );
+	}
+
+	/**
+	 * Prints a checkout button for each plan in the offer.
+	 *
+	 * @param array<int, array{id: string, price: string}> $plans
+	 */
+	public function render_plan_buttons( array $plans ): void {
+		foreach ( $plans as $index => $plan ) {
+			$label = 'yearly' === $plan['id']
+				/* translators: %s: Yearly price, e.g. "$50/year". */
+				? sprintf( __( 'Yearly, %s (2 months free)', 'inkmeter' ), $plan['price'] )
+				/* translators: %s: Monthly price, e.g. "$5/month". */
+				: sprintf( __( 'Monthly, %s', 'inkmeter' ), $plan['price'] );
+			printf(
+				'<button type="submit" name="plan" value="%1$s" class="button%2$s">%3$s</button> ',
+				esc_attr( $plan['id'] ),
+				0 === $index ? ' button-primary' : '',
+				esc_html( $label )
+			);
+		}
 	}
 
 	/**
@@ -303,6 +331,10 @@ class SettingsPage {
 		$is_reachable = true;
 		$settings     = [];
 		$streak       = null;
+		$offer        = [
+			'trial_days' => 0,
+			'plans'      => [],
+		];
 
 		if ( $this->connection->is_connected() ) {
 			$entitlements = $this->call_quietly( 'GET', '/v1/entitlements' );
@@ -313,7 +345,10 @@ class SettingsPage {
 			} elseif ( 200 === $entitlements['status'] ) {
 				$this->connection->update_entitlements( $entitlements['data'] );
 				$settings = $this->call_quietly( 'GET', '/v1/settings' )['data'] ?? [];
-				$streak   = $this->call_quietly( 'GET', '/v1/streak' )['data']['current'] ?? null;
+				if ( ! $this->connection->has_feature( Connection::FEATURE_REMINDERS ) ) {
+					$offer = $this->offer();
+				}
+				$streak = $this->call_quietly( 'GET', '/v1/streak' )['data']['current'] ?? null;
 			}
 		}
 
@@ -412,8 +447,34 @@ class SettingsPage {
 		return $response;
 	}
 
-	private function open_billing_link( string $method, string $path ): void {
-		$response = $this->call( $method, $path );
+	/**
+	 * The plans on sale, from the service: the trial length and the plans that can be bought.
+	 *
+	 * @return array{trial_days: int, plans: array<int, array{id: string, price: string}>}
+	 */
+	private function offer(): array {
+		$data  = $this->call_quietly( 'GET', '/v1/plans' )['data'] ?? [];
+		$plans = [];
+		foreach ( (array) ( $data['plans'] ?? [] ) as $plan ) {
+			if ( is_array( $plan ) && ! empty( $plan['available'] ) && in_array( $plan['id'] ?? null, self::PLANS, true ) ) {
+				$plans[] = [
+					'id'    => (string) $plan['id'],
+					'price' => (string) ( $plan['price'] ?? '' ),
+				];
+			}
+		}
+
+		return [
+			'trial_days' => (int) ( $data['trial_days'] ?? 0 ),
+			'plans'      => $plans,
+		];
+	}
+
+	/**
+	 * @param array<string, mixed>|null $body
+	 */
+	private function open_billing_link( string $method, string $path, ?array $body = null ): void {
+		$response = $this->call( $method, $path, $body );
 		if ( null === $response ) {
 			return;
 		}

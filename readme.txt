@@ -27,7 +27,7 @@ There is nothing to configure. The panel only appears on the Posts list screen, 
 
 Connect your site to Inkmeter Pro under **Settings → Inkmeter** to get an email at the hour you choose when you haven't published yet that day, before your streak breaks. Your streak history is kept in your account, so it survives reinstalls and site moves, and several sites can share one streak.
 
-Inkmeter Pro is a paid subscription. Everything above works without it, and nothing is sent anywhere unless you connect.
+Inkmeter Pro is a paid subscription, monthly or yearly, that starts with a 14-day free trial. Everything above works without it, and nothing is sent anywhere unless you connect.
 
 = Translations =
 
@@ -45,7 +45,7 @@ Inkmeter Pro, which is optional, uses a web service at streakfire.org, run by Dm
 
 * **When connecting:** your browser opens streakfire.org, where you enter your email address; the plugin then sends this site's address and timezone to api.streakfire.org.
 * **After connecting:** a minute after posts change, and once a day, the plugin sends api.streakfire.org the dates on which this site published at least one post, and its timezone. It never sends your posts' titles, content or any other details about them.
-* **When you open Settings → Inkmeter, change reminders, upgrade or manage your subscription:** the plugin asks api.streakfire.org for your plan, reminder settings, streak, and checkout or billing links. Payments happen on Lemon Squeezy, the service's reseller.
+* **When you open Settings → Inkmeter, change reminders, upgrade or manage your subscription:** the plugin asks api.streakfire.org for your plan, reminder settings, streak, the plans on offer, and checkout or billing links. Payments happen on Lemon Squeezy, the service's reseller.
 * **When you disconnect or delete the plugin:** the plugin tells api.streakfire.org to revoke this site's access.
 
 The service's [Terms of service](https://streakfire.org/terms) and [Privacy policy](https://streakfire.org/privacy).
