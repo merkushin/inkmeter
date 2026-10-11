@@ -54,6 +54,11 @@ class Streak {
 	private $post_dates;
 
 	/**
+	 * @var DraftDates
+	 */
+	private $draft_dates;
+
+	/**
 	 * @var StreakCalculator
 	 */
 	private $calculator;
@@ -63,12 +68,13 @@ class Streak {
 	 */
 	private $goal_settings;
 
-	public function __construct( ?PublishedPostDates $post_dates = null, ?StreakCalculator $calculator = null, ?GoalSettings $goal_settings = null ) {
+	public function __construct( ?PublishedPostDates $post_dates = null, ?StreakCalculator $calculator = null, ?GoalSettings $goal_settings = null, ?DraftDates $draft_dates = null ) {
 		$this->hooks         = ServiceFactory::create_hooks();
 		$this->transient     = ServiceFactory::create_transient();
 		$this->post_types    = ServiceFactory::create_post_types();
 		$this->dates         = ServiceFactory::create_dates();
 		$this->post_dates    = $post_dates ?? new PublishedPostDates();
+		$this->draft_dates   = $draft_dates ?? new DraftDates();
 		$this->calculator    = $calculator ?? new StreakCalculator();
 		$this->goal_settings = $goal_settings ?? new GoalSettings();
 	}
@@ -89,17 +95,18 @@ class Streak {
 		$frozen     = is_array( $frozen ) ? array_values( array_filter( $frozen, 'is_string' ) ) : [];
 		$account    = $this->hooks->apply_filters( self::ACCOUNT_DAYS_FILTER, null );
 		$account    = is_array( $account ) ? array_values( array_filter( $account, 'is_string' ) ) : null;
+		$drafts     = $this->goal_settings->counts_drafts();
 
 		// The cache is tied to the day, goal, week start, freezes and account days it
 		// was computed for, so the streak is never stale after midnight or a change of goal.
 		$key    = $today . '|' . $goal->key() . '|' . $week_start . '|' . md5( implode( ',', $frozen ) )
-			. '|' . ( null === $account ? '-' : md5( implode( ',', $account ) ) );
+			. '|' . ( null === $account ? '-' : md5( implode( ',', $account ) ) ) . ( $drafts ? '|drafts' : '' );
 		$cached = $this->transient->get_transient( self::TRANSIENT_KEY );
 		if ( is_array( $cached ) && ( $cached['key'] ?? null ) === $key && is_array( $cached['summary'] ?? null ) ) {
 			return $cached['summary'];
 		}
 
-		$dates = $this->post_dates->get_dates();
+		$dates = $this->writing_dates();
 		if ( null !== $account ) {
 			// This site's own days count at once; the account's arrive with the next sync.
 			$dates = array_values( array_unique( array_merge( $dates, $account ) ) );
@@ -107,8 +114,8 @@ class Streak {
 		$summary = $this->calculator->calculate( $dates, $today, $goal, $week_start, $frozen );
 
 		// For the history calendar: the past year's days (a year of weeks fits in 371) and the freezes.
-		$since                   = gmdate( 'Y-m-d', (int) strtotime( $today . ' -371 days' ) );
-		$summary['recent_days']  = array_values(
+		$since                    = gmdate( 'Y-m-d', (int) strtotime( $today . ' -371 days' ) );
+		$summary['recent_days']   = array_values(
 			array_filter(
 				$dates,
 				static function ( string $date ) use ( $since, $today ): bool {
@@ -116,8 +123,9 @@ class Streak {
 				}
 			)
 		);
-		$summary['frozen']       = $frozen;
-		$summary['across_sites'] = null !== $account;
+		$summary['frozen']        = $frozen;
+		$summary['across_sites']  = null !== $account;
+		$summary['counts_drafts'] = $drafts;
 
 		$this->transient->set_transient(
 			self::TRANSIENT_KEY,
@@ -142,6 +150,31 @@ class Streak {
 	public function save_goal( Goal $goal ): void {
 		$this->goal_settings->save( $goal );
 		$this->transient->delete_transient( self::TRANSIENT_KEY );
+	}
+
+	public function counts_drafts(): bool {
+		return $this->goal_settings->counts_drafts();
+	}
+
+	public function save_counts_drafts( bool $counts ): void {
+		$this->goal_settings->save_counts_drafts( $counts );
+		$this->transient->delete_transient( self::TRANSIENT_KEY );
+	}
+
+	/**
+	 * The site's own writing days: days with a published post, and the days
+	 * spent on drafts when they count. Newest first, without duplicates.
+	 *
+	 * @return string[]
+	 */
+	public function writing_dates(): array {
+		$dates = $this->post_dates->get_dates();
+		if ( $this->goal_settings->counts_drafts() ) {
+			$dates = array_values( array_unique( array_merge( $dates, $this->draft_dates->get_dates() ) ) );
+			rsort( $dates );
+		}
+
+		return $dates;
 	}
 
 	/**

@@ -7,6 +7,7 @@ use Merkushin\Wpal\Service\Hooks;
 use Merkushin\Wpal\Service\PostTypes;
 use Merkushin\Wpal\Service\Transient;
 use Merkushin\Wpal\ServiceFactory;
+use Merkushin\Inkmeter\DraftDates;
 use Merkushin\Inkmeter\Goal;
 use Merkushin\Inkmeter\GoalSettings;
 use Merkushin\Inkmeter\PublishedPostDates;
@@ -177,6 +178,7 @@ class StreakTest extends TestCase {
 						'recent_days'     => [ '2026-03-02', '2026-03-01' ],
 						'frozen'          => [],
 						'across_sites'    => false,
+						'counts_drafts'   => false,
 					],
 				],
 				$this->greaterThan( 0 )
@@ -258,6 +260,57 @@ class StreakTest extends TestCase {
 		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings ) )->get_summary();
 
 		$this->assertSame( 2, $summary['streak'] );
+	}
+
+	public function testGetSummary_CountingDrafts_CountsTheDraftDays(): void {
+		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
+		$this->goal_settings->method( 'counts_drafts' )->willReturn( true );
+		$this->transient->method( 'get_transient' )->willReturn( false );
+		// Monday 2026-03-02: published on Saturday, worked on a draft on Sunday and today.
+		$this->post_dates->method( 'get_dates' )->willReturn( [ '2026-02-28' ] );
+		$drafts = $this->createMock( DraftDates::class );
+		$drafts->method( 'get_dates' )->willReturn( [ '2026-03-02', '2026-03-01' ] );
+
+		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings, $drafts ) )->get_summary();
+
+		$this->assertSame( [ 3, true, true ], [ $summary['streak'], $summary['is_active_today'], $summary['counts_drafts'] ] );
+	}
+
+	public function testGetSummary_NotCountingDrafts_IgnoresThem(): void {
+		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
+		$this->transient->method( 'get_transient' )->willReturn( false );
+		$this->post_dates->method( 'get_dates' )->willReturn( [ '2026-02-28' ] );
+		$drafts = $this->createMock( DraftDates::class );
+		$drafts->expects( $this->never() )->method( 'get_dates' );
+
+		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings, $drafts ) )->get_summary();
+
+		$this->assertSame( 0, $summary['streak'] );
+	}
+
+	public function testGetSummary_DraftsTurnedOnSinceCached_Recalculates(): void {
+		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
+		$this->goal_settings->method( 'counts_drafts' )->willReturn( true );
+		$this->transient->method( 'get_transient' )->willReturn(
+			[
+				'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e|-',
+				'summary' => [ 'streak' => 0 ],
+			]
+		);
+		$this->post_dates->method( 'get_dates' )->willReturn( [] );
+		$drafts = $this->createMock( DraftDates::class );
+		$drafts->method( 'get_dates' )->willReturn( [ '2026-03-02' ] );
+
+		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings, $drafts ) )->get_summary();
+
+		$this->assertSame( 1, $summary['streak'] );
+	}
+
+	public function testSaveCountsDrafts_Always_SavesItAndClearsTheCache(): void {
+		$this->goal_settings->expects( $this->once() )->method( 'save_counts_drafts' )->with( true );
+		$this->transient->expects( $this->once() )->method( 'delete_transient' )->with( Streak::TRANSIENT_KEY );
+
+		( new Streak( $this->post_dates, null, $this->goal_settings ) )->save_counts_drafts( true );
 	}
 
 	public function testSaveGoal_Always_SavesItAndClearsTheCache(): void {

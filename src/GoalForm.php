@@ -23,6 +23,8 @@ class GoalForm {
 
 	public const FIELD = 'inkmeter_goal';
 
+	public const DRAFTS_FIELD = 'inkmeter_count_drafts';
+
 	private const CAPABILITY = 'manage_options';
 
 	/**
@@ -117,6 +119,7 @@ class GoalForm {
 		if ( null !== $goal ) {
 			$this->streak->save_goal( $goal );
 		}
+		$this->streak->save_counts_drafts( '1' === $this->input( $_POST, self::DRAFTS_FIELD ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked above; sanitized by input().
 
 		// Back to the Posts screen, with any filters it had.
 		$back = $this->nonces->wp_get_referer();

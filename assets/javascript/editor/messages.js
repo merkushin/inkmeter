@@ -2,7 +2,10 @@
 // streak summary (see StreakCalculator), so they can be tested in Node.
 //
 // summary: { streak, unit: 'day'|'week', is_active_today, is_goal_met,
-//            goal_days, period_days, days_left, next_milestone }
+//            goal_days, period_days, days_left, next_milestone, counts_drafts }
+//
+// With counts_drafts, saving a draft already counts for the day, so the
+// messages say "wrote" where they would say "published".
 
 // The only module that declares __ and _n: the build keeps these names
 // (config/webpack-config.js) so translate.wordpress.org finds the strings.
@@ -37,6 +40,14 @@ export function prePublishMessage( summary, isScheduled ) {
 				summary.streak
 			);
 		}
+		if ( summary.is_active_today && summary.counts_drafts ) {
+			return sprintf(
+				/* translators: 1: Days with writing so far this week. 2: Days the weekly goal asks for. */
+				_n( 'You already wrote today, so publishing doesn\'t add a day: %1$s of %2$s day this week.', 'You already wrote today, so publishing doesn\'t add a day: %1$s of %2$s days this week.', summary.goal_days, 'inkmeter' ),
+				summary.period_days,
+				summary.goal_days
+			);
+		}
 		if ( summary.is_active_today ) {
 			return sprintf(
 				/* translators: 1: Days with a post so far this week. 2: Days the weekly goal asks for. */
@@ -61,6 +72,13 @@ export function prePublishMessage( summary, isScheduled ) {
 		);
 	}
 
+	if ( summary.is_active_today && summary.counts_drafts ) {
+		return sprintf(
+			/* translators: %s: Number of days. */
+			_n( 'You already wrote today. Your streak is %s day.', 'You already wrote today. Your streak is %s days.', summary.streak, 'inkmeter' ),
+			summary.streak
+		);
+	}
 	if ( summary.is_active_today ) {
 		return sprintf(
 			/* translators: %s: Number of days. */
@@ -108,7 +126,9 @@ export function statusLine( summary ) {
 	}
 
 	if ( 0 === summary.streak ) {
-		return __( 'Publish today to start a streak', 'inkmeter' );
+		return summary.counts_drafts
+			? __( 'Write today to start a streak', 'inkmeter' )
+			: __( 'Publish today to start a streak', 'inkmeter' );
 	}
 	const streak = sprintf(
 		/* translators: %s: Number of days. */
@@ -117,6 +137,13 @@ export function statusLine( summary ) {
 	);
 	if ( summary.is_active_today ) {
 		return streak;
+	}
+	if ( summary.counts_drafts ) {
+		return sprintf(
+			/* translators: %s: Streak in days, e.g. "7-day streak". */
+			__( '%s · write today to keep it', 'inkmeter' ),
+			streak
+		);
 	}
 	return sprintf(
 		/* translators: %s: Streak in days, e.g. "7-day streak". */

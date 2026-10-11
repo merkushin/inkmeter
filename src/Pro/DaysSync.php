@@ -7,6 +7,7 @@ use Merkushin\Wpal\Service\Dates;
 use Merkushin\Wpal\Service\Hooks;
 use Merkushin\Wpal\Service\PostTypes;
 use Merkushin\Wpal\ServiceFactory;
+use Merkushin\Inkmeter\DraftDates;
 use Merkushin\Inkmeter\GoalSettings;
 use Merkushin\Inkmeter\PublishedPostDates;
 
@@ -72,7 +73,12 @@ class DaysSync {
 	 */
 	private $goal_settings;
 
-	public function __construct( Api $api, Connection $connection, ?PublishedPostDates $post_dates = null, ?GoalSettings $goal_settings = null ) {
+	/**
+	 * @var DraftDates
+	 */
+	private $draft_dates;
+
+	public function __construct( Api $api, Connection $connection, ?PublishedPostDates $post_dates = null, ?GoalSettings $goal_settings = null, ?DraftDates $draft_dates = null ) {
 		$this->hooks         = ServiceFactory::create_hooks();
 		$this->cron          = ServiceFactory::create_cron();
 		$this->post_types    = ServiceFactory::create_post_types();
@@ -81,6 +87,7 @@ class DaysSync {
 		$this->connection    = $connection;
 		$this->post_dates    = $post_dates ?? new PublishedPostDates();
 		$this->goal_settings = $goal_settings ?? new GoalSettings();
+		$this->draft_dates   = $draft_dates ?? new DraftDates();
 	}
 
 	public function init(): void {
@@ -92,6 +99,9 @@ class DaysSync {
 		// A new goal changes the streak and when reminders are due.
 		$this->hooks->add_action( 'add_option_' . GoalSettings::OPTION, [ $this, 'schedule_soon' ] );
 		$this->hooks->add_action( 'update_option_' . GoalSettings::OPTION, [ $this, 'schedule_soon' ] );
+		// So does counting drafts, which changes the days themselves.
+		$this->hooks->add_action( 'add_option_' . GoalSettings::DRAFTS_OPTION, [ $this, 'schedule_soon' ] );
+		$this->hooks->add_action( 'update_option_' . GoalSettings::DRAFTS_OPTION, [ $this, 'schedule_soon' ] );
 	}
 
 	/**
@@ -126,15 +136,24 @@ class DaysSync {
 			return;
 		}
 
+		// Only this site's own days: the service combines the account's sites itself.
+		$days   = $this->post_dates->get_dates();
+		$drafts = $this->goal_settings->counts_drafts();
+		if ( $drafts ) {
+			$days = array_values( array_unique( array_merge( $days, $this->draft_dates->get_dates() ) ) );
+			rsort( $days );
+		}
+
 		$response = $this->api->request(
 			'PUT',
 			'/v1/days',
 			$token,
 			[
-				'days'           => $this->post_dates->get_dates(),
+				'days'           => $days,
 				'timezone'       => (string) $this->dates->wp_timezone_string(),
 				'goal'           => $this->goal_settings->goal()->to_array(),
 				'week_starts_on' => $this->goal_settings->week_start(),
+				'counts_drafts'  => $drafts,
 			]
 		);
 

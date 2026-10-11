@@ -8,6 +8,8 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 // A closure keeps these variables out of the global scope.
 ( static function (): void {
 	delete_transient( 'inkmeter_summary' );
+	delete_option( 'inkmeter_goal' );
+	delete_option( 'inkmeter_count_drafts' );
 
 	// Inkmeter Pro. Revoke the site's token, best effort, so it can't be used again.
 	$connection = get_option( 'inkmeter_connection' );

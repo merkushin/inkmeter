@@ -25,6 +25,7 @@
  * @var int|null    $freezes_left         Inkmeter Pro streak freezes left this month; null without them.
  * @var string      $freezes_left_label   $freezes_left formatted for the locale.
  * @var bool        $saved_by_freeze      Whether a streak freeze covered yesterday (or last week) and kept the streak.
+ * @var bool        $counts_drafts        Whether days spent on a draft count, so the panel says "wrote" rather than "published".
  * @var bool        $across_sites         Whether the streak and calendar count the account's other sites (Inkmeter Pro).
  * @var array<string, mixed> $history     HistoryCalendar::build() for the calendar.
  * @var string      $history_published    Days with a post shown in the calendar, formatted for the locale.
@@ -56,7 +57,15 @@ defined( 'ABSPATH' ) || exit;
 				esc_html_e( 'Not enough days are left to meet this week\'s goal. A new streak starts next week.', 'inkmeter' );
 			} elseif ( $is_weekly ) {
 				/* translators: %s: Number of days. */
-				echo esc_html( sprintf( _n( 'Publish on %s more day this week to keep it going', 'Publish on %s more days this week to keep it going', $days_needed, 'inkmeter' ), $days_needed_label ) );
+				echo esc_html(
+					$counts_drafts
+						/* translators: %s: Number of days. */
+						? sprintf( _n( 'Write on %s more day this week to keep it going', 'Write on %s more days this week to keep it going', $days_needed, 'inkmeter' ), $days_needed_label )
+						/* translators: %s: Number of days. */
+						: sprintf( _n( 'Publish on %s more day this week to keep it going', 'Publish on %s more days this week to keep it going', $days_needed, 'inkmeter' ), $days_needed_label )
+				);
+			} elseif ( $counts_drafts ) {
+				esc_html_e( 'You are still alive, write today to keep it going', 'inkmeter' );
 			} else {
 				esc_html_e( 'You are still alive, publish today to keep it going', 'inkmeter' );
 			}
@@ -74,6 +83,10 @@ defined( 'ABSPATH' ) || exit;
 						<select id="inkmeter-goal" name="<?php echo esc_attr( \Merkushin\Inkmeter\GoalForm::FIELD ); ?>">
 							<?php $this->render_goal_options( $goal ); ?>
 						</select>
+						<label class="inkmeter-panel__drafts" for="inkmeter-count-drafts">
+							<input type="checkbox" id="inkmeter-count-drafts" name="<?php echo esc_attr( \Merkushin\Inkmeter\GoalForm::DRAFTS_FIELD ); ?>" value="1"<?php checked( $counts_drafts ); ?> />
+							<?php esc_html_e( 'Count days I work on a draft, not only days I publish', 'inkmeter' ); ?>
+						</label>
 						<button type="submit" class="button"><?php esc_html_e( 'Save goal', 'inkmeter' ); ?></button>
 					</form>
 				</details>
@@ -127,8 +140,8 @@ defined( 'ABSPATH' ) || exit;
 				</div>
 			<?php else : ?>
 				<div class="inkmeter-panel__stat">
-					<span class="inkmeter-panel__stat-label"><?php esc_html_e( 'Last published', 'inkmeter' ); ?></span>
-					<span class="inkmeter-panel__stat-value"><?php echo esc_html( $last_post_label ?? __( 'No published posts yet', 'inkmeter' ) ); ?></span>
+					<span class="inkmeter-panel__stat-label"><?php echo esc_html( $counts_drafts ? __( 'Last writing day', 'inkmeter' ) : __( 'Last published', 'inkmeter' ) ); ?></span>
+					<span class="inkmeter-panel__stat-value"><?php echo esc_html( $last_post_label ?? ( $counts_drafts ? __( 'No writing days yet', 'inkmeter' ) : __( 'No published posts yet', 'inkmeter' ) ) ); ?></span>
 				</div>
 			<?php endif; ?>
 			<div class="inkmeter-panel__stat">
@@ -168,7 +181,11 @@ defined( 'ABSPATH' ) || exit;
 				<span>
 					<?php
 					if ( ! $is_weekly ) {
-						echo esc_html( $is_goal_met ? __( 'Published today', 'inkmeter' ) : __( 'Needs a post today', 'inkmeter' ) );
+						if ( $counts_drafts ) {
+							echo esc_html( $is_goal_met ? __( 'Wrote today', 'inkmeter' ) : __( 'Needs writing today', 'inkmeter' ) );
+						} else {
+							echo esc_html( $is_goal_met ? __( 'Published today', 'inkmeter' ) : __( 'Needs a post today', 'inkmeter' ) );
+						}
 					} elseif ( $is_goal_met ) {
 						esc_html_e( 'Goal met this week', 'inkmeter' );
 					} elseif ( $is_out_of_reach ) {
@@ -201,8 +218,13 @@ defined( 'ABSPATH' ) || exit;
 			<span class="inkmeter-history__title"><?php esc_html_e( 'Past year', 'inkmeter' ); ?></span>
 			<span class="inkmeter-history__summary">
 				<?php
-				/* translators: 1: Days with a published post. 2: Days in the period shown. */
-				echo esc_html( sprintf( _n( 'Published on %1$s of %2$s day', 'Published on %1$s of %2$s days', (int) $history['days'], 'inkmeter' ), $history_published, $history_days ) );
+				echo esc_html(
+					$counts_drafts
+						/* translators: 1: Days with writing (a published post or work on a draft). 2: Days in the period shown. */
+						? sprintf( _n( 'Wrote on %1$s of %2$s day', 'Wrote on %1$s of %2$s days', (int) $history['days'], 'inkmeter' ), $history_published, $history_days )
+						/* translators: 1: Days with a published post. 2: Days in the period shown. */
+						: sprintf( _n( 'Published on %1$s of %2$s day', 'Published on %1$s of %2$s days', (int) $history['days'], 'inkmeter' ), $history_published, $history_days )
+				);
 				?>
 			</span>
 		</div>
@@ -210,11 +232,11 @@ defined( 'ABSPATH' ) || exit;
 			<?php $this->render_history( $history ); ?>
 		</div>
 		<div class="inkmeter-history__legend" aria-hidden="true">
-			<span><span class="inkmeter-history__day is-published"></span><?php esc_html_e( 'Published', 'inkmeter' ); ?></span>
+			<span><span class="inkmeter-history__day is-published"></span><?php echo esc_html( $counts_drafts ? __( 'Wrote', 'inkmeter' ) : __( 'Published', 'inkmeter' ) ); ?></span>
 			<?php if ( $history_has_frozen ) : ?>
 				<span><span class="inkmeter-history__day is-frozen"></span><?php esc_html_e( 'Streak freeze', 'inkmeter' ); ?></span>
 			<?php endif; ?>
-			<span><span class="inkmeter-history__day is-empty"></span><?php esc_html_e( 'No post', 'inkmeter' ); ?></span>
+			<span><span class="inkmeter-history__day is-empty"></span><?php echo esc_html( $counts_drafts ? __( 'No writing', 'inkmeter' ) : __( 'No post', 'inkmeter' ) ); ?></span>
 		</div>
 	</div>
 </div>

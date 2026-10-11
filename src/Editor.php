@@ -28,7 +28,7 @@ class Editor {
 	/**
 	 * The summary fields the editor uses.
 	 */
-	private const FIELDS = [ 'streak', 'unit', 'is_active_today', 'is_goal_met', 'goal_days', 'period_days', 'days_left', 'next_milestone' ];
+	private const FIELDS = [ 'streak', 'unit', 'is_active_today', 'is_goal_met', 'goal_days', 'period_days', 'days_left', 'next_milestone', 'counts_drafts' ];
 
 	/**
 	 * @var Hooks

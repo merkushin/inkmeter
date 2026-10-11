@@ -436,6 +436,29 @@ class PluginTest extends TestCase {
 		$this->assertStringNotContainsString( 'Counting posts on all your connected sites', $html );
 	}
 
+	public function testRenderStreakPanel_CountingDrafts_SaysWrote(): void {
+		$this->streak->method( 'counts_drafts' )->willReturn( true );
+		$this->streak->method( 'goal' )->willReturn( Goal::daily() );
+		$this->goal_form->method( 'can_change' )->willReturn( true );
+		$this->dates->method( 'current_time' )->willReturn( '2026-03-03' );
+		$this->dates->method( 'wp_date' )->willReturn( 'Mar 3' );
+
+		$html = $this->render_panel_with(
+			[
+				'is_active_today' => true,
+				'is_goal_met'     => true,
+				'recent_days'     => [ '2026-03-03' ],
+				'counts_drafts'   => true,
+			]
+		);
+
+		foreach ( [ 'Write every day', 'Wrote today', 'Last writing day', 'Wrote on 1 of', 'Mar 3: wrote', 'No writing' ] as $expected ) {
+			$this->assertStringContainsString( $expected, $html );
+		}
+		$this->assertStringContainsString( 'name="inkmeter_count_drafts" value="1" checked=\'checked\'', $html );
+		$this->assertStringNotContainsString( 'Published today', $html );
+	}
+
 	public function testRenderStreakPanel_AcrossSites_SaysSo(): void {
 		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
 

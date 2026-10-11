@@ -179,6 +179,7 @@ class Plugin {
 		$freezes_left_label   = null === $freezes_left ? '' : $this->format_number( $freezes_left );
 		$saved_by_freeze      = (bool) ( $summary['saved_by_freeze'] ?? false );
 		$across_sites         = (bool) ( $summary['across_sites'] ?? false );
+		$counts_drafts        = (bool) ( $summary['counts_drafts'] ?? false );
 		$history              = ( new HistoryCalendar() )->build(
 			(array) ( $summary['recent_days'] ?? [] ),
 			(array) ( $summary['frozen'] ?? [] ),
@@ -280,12 +281,17 @@ class Plugin {
 	 * The goal in words, e.g. "Publish on 3 days a week".
 	 */
 	public function goal_label( Goal $goal ): string {
+		$drafts = $this->streak->counts_drafts();
 		if ( ! $goal->is_weekly() ) {
-			return __( 'Publish every day', 'inkmeter' );
+			return $drafts ? __( 'Write every day', 'inkmeter' ) : __( 'Publish every day', 'inkmeter' );
 		}
 
-		/* translators: %s: Number of days. */
-		return sprintf( _n( 'Publish on %s day a week', 'Publish on %s days a week', $goal->days(), 'inkmeter' ), $this->format_number( $goal->days() ) );
+		$days = $this->format_number( $goal->days() );
+		return $drafts
+			/* translators: %s: Number of days. */
+			? sprintf( _n( 'Write on %s day a week', 'Write on %s days a week', $goal->days(), 'inkmeter' ), $days )
+			/* translators: %s: Number of days. */
+			: sprintf( _n( 'Publish on %s day a week', 'Publish on %s days a week', $goal->days(), 'inkmeter' ), $days );
 	}
 
 	/**
@@ -315,16 +321,22 @@ class Plugin {
 		$label = (string) $this->format_date( $date );
 		switch ( $state ) {
 			case HistoryCalendar::PUBLISHED:
-				/* translators: %s: A date. */
-				return sprintf( __( '%s: published', 'inkmeter' ), $label );
+				return $this->streak->counts_drafts()
+					/* translators: %s: A date. */
+					? sprintf( __( '%s: wrote', 'inkmeter' ), $label )
+					/* translators: %s: A date. */
+					: sprintf( __( '%s: published', 'inkmeter' ), $label );
 			case HistoryCalendar::FROZEN:
 				/* translators: %s: A date. */
 				return sprintf( __( '%s: covered by a streak freeze', 'inkmeter' ), $label );
 			case HistoryCalendar::FUTURE:
 				return $label;
 			default:
-				/* translators: %s: A date. */
-				return sprintf( __( '%s: no post', 'inkmeter' ), $label );
+				return $this->streak->counts_drafts()
+					/* translators: %s: A date. */
+					? sprintf( __( '%s: no writing', 'inkmeter' ), $label )
+					/* translators: %s: A date. */
+					: sprintf( __( '%s: no post', 'inkmeter' ), $label );
 		}
 	}
 
