@@ -96,6 +96,24 @@
   text-decoration-color: var(--inkmeter-strong);
   text-underline-offset: 3px;
 }
+.inkmeter-panel__dismiss {
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--inkmeter-muted);
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.inkmeter-panel__dismiss:hover,
+.inkmeter-panel__dismiss:focus {
+  color: var(--inkmeter-text);
+}
+.inkmeter-panel__reminders[hidden] {
+  display: none;
+}
 .inkmeter-panel__reminders a:hover,
 .inkmeter-panel__reminders a:focus {
   color: var(--inkmeter-text);

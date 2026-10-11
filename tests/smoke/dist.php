@@ -325,6 +325,10 @@ function esc_html_e( string $text, string $domain = 'default' ): void {
 	echo esc_html( $text );
 }
 
+function esc_attr_e( string $text, string $domain = 'default' ): void {
+	echo esc_attr( $text );
+}
+
 // The one query, in PublishedPostDates.
 $GLOBALS['wpdb'] = new class() {
 	/**
@@ -366,7 +370,7 @@ if ( 2 !== count( $GLOBALS['smoke_enqueued'] ) ) {
 ob_start();
 smoke_do( 'all_admin_notices' );
 $text = trim( (string) preg_replace( '/\s+/', ' ', strip_tags( (string) ob_get_clean() ) ) );
-foreach ( [ 'Current run 3 days', 'Last published March 2, 2026', 'Next milestone 7 days', 'Published today', 'Get an email before your streak breaks', 'Publish every day', 'Change goal', 'Past year', 'Published on 3 of' ] as $expected ) {
+foreach ( [ 'Current run 3 days', 'Last published March 2, 2026', 'Next milestone 7 days', 'Published today', 'Inkmeter Pro: get an email before your streak breaks', 'Publish every day', 'Change goal', 'Past year', 'Published on 3 of' ] as $expected ) {
 	if ( false === strpos( $text, $expected ) ) {
 		smoke_fail( "panel is missing \"{$expected}\": {$text}" );
 	}

@@ -521,6 +521,8 @@ class SettingsPageTest extends TestCase {
 		$this->assertStringContainsString( 'Nothing is sent until you connect.', $text );
 		$this->assertStringContainsString( 'name="action" value="inkmeter_connect"', $text );
 		$this->assertStringContainsString( 'href="https://streakfire.test/privacy"', $text );
+		$this->assertStringContainsString( 'Inkmeter Pro is a paid subscription that starts with a free trial.', $text );
+		$this->assertStringContainsString( 'Two streak freezes a month', $text );
 	}
 
 	public function testRender_ConnectedPro_ShowsAccountRemindersAndManage(): void {

@@ -12,3 +12,17 @@ if ( toggle && panel ) {
 		}
 	} );
 }
+
+// The panel's Inkmeter Pro link can be dismissed for good, also per user.
+const proLink = document.getElementById( 'inkmeter-pro-link' );
+const dismiss = document.getElementById( 'inkmeter-pro-link-dismiss' );
+
+if ( proLink && dismiss ) {
+	dismiss.addEventListener( 'click', () => {
+		proLink.hidden = true;
+
+		if ( typeof window.setUserSetting === 'function' ) {
+			window.setUserSetting( 'inkmeter_pro_link', 'off' );
+		}
+	} );
+}

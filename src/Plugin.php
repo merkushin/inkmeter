@@ -30,6 +30,11 @@ class Plugin {
 	public const PANEL_SETTING = 'inkmeter_panel';
 
 	/**
+	 * User setting: 'off' once the user dismissed the panel's Inkmeter Pro link.
+	 */
+	public const PRO_LINK_SETTING = 'inkmeter_pro_link';
+
+	/**
 	 * Weeks in the history calendar: the past year.
 	 */
 	private const HISTORY_WEEKS = 53;
@@ -169,7 +174,7 @@ class Plugin {
 		$period_days_label    = $this->format_number( $period_days );
 		$days_needed_label    = $this->format_number( $days_needed );
 		$is_panel_visible     = $this->is_panel_visible();
-		$reminders_url        = $this->pro->reminders_url();
+		$reminders_url        = 'off' === $this->user_settings->get_user_setting( self::PRO_LINK_SETTING, 'on' ) ? null : $this->pro->reminders_url();
 		$freezes_left         = $this->pro->freezes_left();
 		$freezes_left_label   = null === $freezes_left ? '' : $this->format_number( $freezes_left );
 		$saved_by_freeze      = (bool) ( $summary['saved_by_freeze'] ?? false );

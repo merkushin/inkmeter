@@ -37,11 +37,8 @@ defined( 'ABSPATH' ) || exit;
 	<?php if ( ! $is_connected ) : ?>
 		<h2><?php esc_html_e( 'Inkmeter Pro', 'inkmeter' ); ?></h2>
 		<p><?php esc_html_e( 'Never lose a streak by accident. With Inkmeter Pro:', 'inkmeter' ); ?></p>
-		<ul class="ul-disc">
-			<li><?php esc_html_e( 'You get an email at the hour you choose when you haven\'t published yet that day.', 'inkmeter' ); ?></li>
-			<li><?php esc_html_e( 'Every week, an email recaps the days you wrote, your streak and streak freezes left.', 'inkmeter' ); ?></li>
-			<li><?php esc_html_e( 'Your streak history is kept in your Inkmeter account, so it survives reinstalls and site moves.', 'inkmeter' ); ?></li>
-		</ul>
+		<?php $this->render_pro_features(); ?>
+		<p><?php esc_html_e( 'Inkmeter Pro is a paid subscription that starts with a free trial. Connecting is free, and you decide whether to subscribe afterwards. Everything else in Inkmeter works without it.', 'inkmeter' ); ?></p>
 		<p>
 			<?php
 			printf(
@@ -180,7 +177,7 @@ defined( 'ABSPATH' ) || exit;
 				}
 				?>
 			</h2>
-			<p><?php esc_html_e( 'Get an email at the hour you choose when you haven\'t published yet that day.', 'inkmeter' ); ?></p>
+			<?php $this->render_pro_features(); ?>
 			<?php if ( [] === $offer['plans'] ) : ?>
 				<p><?php esc_html_e( 'Inkmeter Pro can\'t be bought just yet. Please check back soon.', 'inkmeter' ); ?></p>
 			<?php else : ?>

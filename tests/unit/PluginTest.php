@@ -82,8 +82,7 @@ class PluginTest extends TestCase {
 		$this->editor    = $this->createMock( Editor::class );
 		$this->goal_form->method( 'action_url' )->willReturn( 'https://example.com/wp-admin/admin-post.php' );
 
-		$this->user_settings = $this->createMock( UserSettings::class );
-		$this->user_settings->method( 'get_user_setting' )->with( Plugin::PANEL_SETTING, 'on' )->willReturn( 'on' );
+		$this->use_user_settings( [] );
 
 		$plugins = $this->createMock( Plugins::class );
 		$plugins->method( 'plugin_dir_url' )->with( self::PLUGIN_FILE )->willReturn( self::PLUGIN_URL );
@@ -375,7 +374,16 @@ class PluginTest extends TestCase {
 		$html = $this->render_panel();
 
 		$this->assertStringContainsString( 'href="https://example.com/wp-admin/options-general.php?page=inkmeter"', $html );
-		$this->assertStringContainsString( 'Get an email before your streak breaks', $html );
+		$this->assertStringContainsString( 'Inkmeter Pro: get an email before your streak breaks', $html );
+		$this->assertStringContainsString( 'id="inkmeter-pro-link-dismiss"', $html );
+	}
+
+	public function testRenderStreakPanel_ProLinkDismissed_HasNoLink(): void {
+		$this->pro->method( 'reminders_url' )->willReturn( 'https://example.com/wp-admin/options-general.php?page=inkmeter' );
+		$this->use_user_settings( [ Plugin::PRO_LINK_SETTING => 'off' ] );
+		ServiceFactory::set_custom_user_settings( $this->user_settings );
+
+		$this->assertStringNotContainsString( 'inkmeter-panel__reminders', $this->render_panel() );
 	}
 
 	public function testRenderStreakPanel_RemindersSetUpOrNotAllowed_HasNoLink(): void {
@@ -498,9 +506,20 @@ class PluginTest extends TestCase {
 	}
 
 	private function use_panel_setting( string $value ): void {
-		$this->user_settings = $this->createMock( UserSettings::class );
-		$this->user_settings->method( 'get_user_setting' )->with( Plugin::PANEL_SETTING, 'on' )->willReturn( $value );
+		$this->use_user_settings( [ Plugin::PANEL_SETTING => $value ] );
 		ServiceFactory::set_custom_user_settings( $this->user_settings );
+	}
+
+	/**
+	 * @param array<string, string> $values User settings that aren't at their default.
+	 */
+	private function use_user_settings( array $values ): void {
+		$this->user_settings = $this->createMock( UserSettings::class );
+		$this->user_settings->method( 'get_user_setting' )->willReturnCallback(
+			static function ( string $name, $default_value ) use ( $values ) {
+				return $values[ $name ] ?? $default_value;
+			}
+		);
 	}
 
 	private function render_panel(): string {
