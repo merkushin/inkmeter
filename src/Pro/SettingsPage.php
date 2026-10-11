@@ -384,6 +384,24 @@ class SettingsPage {
 	}
 
 	/**
+	 * Prints what Inkmeter Pro adds, for the pitch before connecting and the upgrade section.
+	 */
+	public function render_pro_features(): void {
+		$features = [
+			__( 'You get an email at the hour you choose when your goal needs a post that day.', 'inkmeter' ),
+			__( 'Two streak freezes a month cover a missed day (or a week, with a weekly goal), so your streak lives on.', 'inkmeter' ),
+			__( 'Every week, an email recaps the days you wrote, your streak and streak freezes left.', 'inkmeter' ),
+			__( 'Your streak history is kept in your Inkmeter account, so it survives reinstalls and site moves, and the history calendar includes all your connected sites.', 'inkmeter' ),
+		];
+
+		echo '<ul class="ul-disc">';
+		foreach ( $features as $feature ) {
+			printf( '<li>%s</li>', esc_html( $feature ) );
+		}
+		echo '</ul>';
+	}
+
+	/**
 	 * Prints the reminder hour choices, 00:00 to 23:00.
 	 */
 	public function render_hour_options( int $selected ): void {

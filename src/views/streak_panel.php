@@ -21,7 +21,7 @@
  * @var int         $progress             Milestone progress, 0-100.
  * @var string      $progress_label       $progress formatted for the locale.
  * @var bool        $is_panel_visible     False when the user hid the panel in Screen Options.
- * @var string|null $reminders_url        Settings page for Pro reminders; null when they're set up or the user can't manage them.
+ * @var string|null $reminders_url        Settings page for Pro reminders; null when they're set up, dismissed or the user can't manage them.
  * @var int|null    $freezes_left         Inkmeter Pro streak freezes left this month; null without them.
  * @var string      $freezes_left_label   $freezes_left formatted for the locale.
  * @var bool        $saved_by_freeze      Whether a streak freeze covered yesterday (or last week) and kept the streak.
@@ -92,7 +92,10 @@ defined( 'ABSPATH' ) || exit;
 			</p>
 		<?php endif; ?>
 		<?php if ( null !== $reminders_url ) : ?>
-			<p class="inkmeter-panel__reminders"><a href="<?php echo esc_url( $reminders_url ); ?>"><?php esc_html_e( 'Get an email before your streak breaks', 'inkmeter' ); ?></a></p>
+			<p class="inkmeter-panel__reminders" id="inkmeter-pro-link">
+				<a href="<?php echo esc_url( $reminders_url ); ?>"><?php esc_html_e( 'Inkmeter Pro: get an email before your streak breaks', 'inkmeter' ); ?></a>
+				<button type="button" class="inkmeter-panel__dismiss" id="inkmeter-pro-link-dismiss" aria-label="<?php esc_attr_e( 'Hide this link', 'inkmeter' ); ?>">&times;</button>
+			</p>
 		<?php endif; ?>
 		<div class="inkmeter-panel__stats">
 			<div class="inkmeter-panel__stat">
