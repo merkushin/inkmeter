@@ -19,6 +19,13 @@ class Streak {
 	 */
 	public const FROZEN_FILTER = 'inkmeter_frozen_periods';
 
+	/**
+	 * Filters the days (Y-m-d) the site's Inkmeter account published on across
+	 * all its sites, or null without them. Inkmeter Pro fills it, so the streak
+	 * and calendar count every connected site.
+	 */
+	public const ACCOUNT_DAYS_FILTER = 'inkmeter_account_days';
+
 	private const CACHE_TTL = 86400;
 
 	/**
@@ -80,21 +87,28 @@ class Streak {
 		$week_start = $this->goal_settings->week_start();
 		$frozen     = $this->hooks->apply_filters( self::FROZEN_FILTER, [], $goal->is_weekly() ? 'week' : 'day' );
 		$frozen     = is_array( $frozen ) ? array_values( array_filter( $frozen, 'is_string' ) ) : [];
+		$account    = $this->hooks->apply_filters( self::ACCOUNT_DAYS_FILTER, null );
+		$account    = is_array( $account ) ? array_values( array_filter( $account, 'is_string' ) ) : null;
 
-		// The cache is tied to the day, goal, week start and freezes it was computed
-		// for, so the streak is never stale after midnight or a change of goal.
-		$key    = $today . '|' . $goal->key() . '|' . $week_start . '|' . md5( implode( ',', $frozen ) );
+		// The cache is tied to the day, goal, week start, freezes and account days it
+		// was computed for, so the streak is never stale after midnight or a change of goal.
+		$key    = $today . '|' . $goal->key() . '|' . $week_start . '|' . md5( implode( ',', $frozen ) )
+			. '|' . ( null === $account ? '-' : md5( implode( ',', $account ) ) );
 		$cached = $this->transient->get_transient( self::TRANSIENT_KEY );
 		if ( is_array( $cached ) && ( $cached['key'] ?? null ) === $key && is_array( $cached['summary'] ?? null ) ) {
 			return $cached['summary'];
 		}
 
-		$dates   = $this->post_dates->get_dates();
+		$dates = $this->post_dates->get_dates();
+		if ( null !== $account ) {
+			// This site's own days count at once; the account's arrive with the next sync.
+			$dates = array_values( array_unique( array_merge( $dates, $account ) ) );
+		}
 		$summary = $this->calculator->calculate( $dates, $today, $goal, $week_start, $frozen );
 
 		// For the history calendar: the past year's days (a year of weeks fits in 371) and the freezes.
-		$since                  = gmdate( 'Y-m-d', (int) strtotime( $today . ' -371 days' ) );
-		$summary['recent_days'] = array_values(
+		$since                   = gmdate( 'Y-m-d', (int) strtotime( $today . ' -371 days' ) );
+		$summary['recent_days']  = array_values(
 			array_filter(
 				$dates,
 				static function ( string $date ) use ( $since, $today ): bool {
@@ -102,7 +116,8 @@ class Streak {
 				}
 			)
 		);
-		$summary['frozen']      = $frozen;
+		$summary['frozen']       = $frozen;
+		$summary['across_sites'] = null !== $account;
 
 		$this->transient->set_transient(
 			self::TRANSIENT_KEY,

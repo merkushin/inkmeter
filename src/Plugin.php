@@ -178,29 +178,27 @@ class Plugin {
 		$freezes_left         = $this->pro->freezes_left();
 		$freezes_left_label   = null === $freezes_left ? '' : $this->format_number( $freezes_left );
 		$saved_by_freeze      = (bool) ( $summary['saved_by_freeze'] ?? false );
-		// With Inkmeter Pro, the account's days from all its sites join this site's own.
-		$account_days       = $this->pro->history_days();
-		$history_all_sites  = null !== $account_days;
-		$history            = ( new HistoryCalendar() )->build(
-			array_merge( (array) ( $summary['recent_days'] ?? [] ), $account_days ?? [] ),
+		$across_sites         = (bool) ( $summary['across_sites'] ?? false );
+		$history              = ( new HistoryCalendar() )->build(
+			(array) ( $summary['recent_days'] ?? [] ),
 			(array) ( $summary['frozen'] ?? [] ),
 			$is_weekly,
 			(string) $this->dates->current_time( 'Y-m-d' ),
 			$this->streak->week_start(),
 			self::HISTORY_WEEKS
 		);
-		$history_published  = $this->format_number( $history['published'] );
-		$history_days       = $this->format_number( $history['days'] );
-		$history_has_frozen = [] !== array_filter(
+		$history_published    = $this->format_number( $history['published'] );
+		$history_days         = $this->format_number( $history['days'] );
+		$history_has_frozen   = [] !== array_filter(
 			$history['weeks'],
 			static function ( array $week ): bool {
 				return in_array( HistoryCalendar::FROZEN, array_column( $week['days'], 'state' ), true );
 			}
 		);
-		$goal               = $this->streak->goal();
-		$goal_options       = Goal::all();
-		$can_change_goal    = $this->goal_form->can_change();
-		$goal_action_url    = $this->goal_form->action_url();
+		$goal                 = $this->streak->goal();
+		$goal_options         = Goal::all();
+		$can_change_goal      = $this->goal_form->can_change();
+		$goal_action_url      = $this->goal_form->action_url();
 
 		include __DIR__ . '/views/streak_panel.php';
 	}

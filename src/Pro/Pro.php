@@ -61,6 +61,7 @@ class Pro {
 		$this->sync->init();
 		$this->settings_page->init();
 		$this->hooks->add_filter( Streak::FROZEN_FILTER, [ $this, 'frozen_periods' ], 10, 2 );
+		$this->hooks->add_filter( Streak::ACCOUNT_DAYS_FILTER, [ $this, 'account_days' ] );
 	}
 
 	/**
@@ -80,14 +81,19 @@ class Pro {
 	}
 
 	/**
-	 * The account's days with a post across all its sites, which the service
-	 * keeps through reinstalls and site moves, for the history calendar; null
-	 * without the history feature.
+	 * Adds the account's days from all its sites, which the service keeps
+	 * through reinstalls and site moves, to the panel's streak and calendar.
+	 *
+	 * @param mixed $days
 	 *
 	 * @return string[]|null
 	 */
-	public function history_days(): ?array {
-		return $this->connection->has_feature( Connection::FEATURE_HISTORY ) ? $this->connection->history_days() : null;
+	public function account_days( $days ): ?array {
+		if ( ! $this->connection->has_feature( Connection::FEATURE_HISTORY ) ) {
+			return is_array( $days ) ? $days : null;
+		}
+
+		return $this->connection->account_days();
 	}
 
 	/**

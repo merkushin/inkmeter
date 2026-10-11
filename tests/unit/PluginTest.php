@@ -419,7 +419,6 @@ class PluginTest extends TestCase {
 	}
 
 	public function testRenderStreakPanel_History_ShowsThePastYearWithoutPro(): void {
-		$this->pro->method( 'history_days' )->willReturn( null );
 		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
 		$this->dates->method( 'wp_date' )->willReturn( 'Mar 2' );
 		$html = $this->render_panel_with(
@@ -434,17 +433,15 @@ class PluginTest extends TestCase {
 		$this->assertStringContainsString( 'Published on 3 of 368 days', $html );
 		$this->assertStringContainsString( 'class="inkmeter-history__day is-frozen" title="Mar 2: covered by a streak freeze"', $html );
 		$this->assertStringContainsString( 'Streak freeze', $html );
-		$this->assertStringNotContainsString( 'Across all your connected sites', $html );
+		$this->assertStringNotContainsString( 'Counting posts on all your connected sites', $html );
 	}
 
-	public function testRenderStreakPanel_HistoryWithPro_AddsTheAccountsOtherSites(): void {
-		$this->pro->method( 'history_days' )->willReturn( [ '2026-03-01', '2026-03-03' ] );
+	public function testRenderStreakPanel_AcrossSites_SaysSo(): void {
 		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
 
-		$html = $this->render_panel_with( [ 'recent_days' => [ '2026-03-03', '2026-03-05' ] ] );
+		$html = $this->render_panel_with( [ 'across_sites' => true ] );
 
-		$this->assertStringContainsString( 'Published on 3 of 368 days', $html, 'this site\'s days and the account\'s, counted once' );
-		$this->assertStringContainsString( 'Across all your connected sites', $html );
+		$this->assertStringContainsString( 'Counting posts on all your connected sites', $html );
 	}
 
 	/**
