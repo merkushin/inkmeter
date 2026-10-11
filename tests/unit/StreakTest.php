@@ -45,6 +45,11 @@ class StreakTest extends TestCase {
 	 */
 	private $frozen = [];
 
+	/**
+	 * @var string[]|null What the account-days filter returns.
+	 */
+	private $account_days = null;
+
 	protected function setUp(): void {
 		$this->transient  = $this->createMock( Transient::class );
 		$this->post_types = $this->createMock( PostTypes::class );
@@ -53,11 +58,14 @@ class StreakTest extends TestCase {
 		$this->goal_settings = $this->createMock( GoalSettings::class );
 		$this->goal_settings->method( 'week_start' )->willReturn( 1 );
 
-		// No freezes unless a test adds them, as without Inkmeter Pro.
+		// No freezes or account days unless a test adds them, as without Inkmeter Pro.
 		$this->hooks = $this->createMock( Hooks::class );
 		$this->hooks->method( 'apply_filters' )->willReturnCallback(
 			function ( string $hook, $value ) {
-				return Streak::FROZEN_FILTER === $hook ? $this->frozen : $value;
+				if ( Streak::FROZEN_FILTER === $hook ) {
+					return $this->frozen;
+				}
+				return Streak::ACCOUNT_DAYS_FILTER === $hook ? $this->account_days : $value;
 			}
 		);
 		ServiceFactory::set_custom_hooks( $this->hooks );
@@ -111,7 +119,7 @@ class StreakTest extends TestCase {
 		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
 		$this->transient->method( 'get_transient' )->willReturn(
 			[
-				'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e',
+				'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e|-',
 				'summary' => $cached,
 			]
 		);
@@ -154,7 +162,7 @@ class StreakTest extends TestCase {
 			->with(
 				Streak::TRANSIENT_KEY,
 				[
-					'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e',
+					'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e|-',
 					'summary' => [
 						'streak'          => 2,
 						'unit'            => 'day',
@@ -168,6 +176,7 @@ class StreakTest extends TestCase {
 						'next_milestone'  => 3,
 						'recent_days'     => [ '2026-03-02', '2026-03-01' ],
 						'frozen'          => [],
+						'across_sites'    => false,
 					],
 				],
 				$this->greaterThan( 0 )
@@ -219,6 +228,36 @@ class StreakTest extends TestCase {
 		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings ) )->get_summary();
 
 		$this->assertSame( 1, $summary['streak'] );
+	}
+
+	public function testGetSummary_AccountDays_CountsTheOtherSites(): void {
+		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
+		$this->transient->method( 'get_transient' )->willReturn( false );
+		// Monday 2026-03-02: this site published on Saturday and today, another site on Sunday.
+		$this->post_dates->method( 'get_dates' )->willReturn( [ '2026-03-02', '2026-02-28' ] );
+		$this->account_days = [ '2026-02-28', '2026-03-01' ];
+
+		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings ) )->get_summary();
+
+		$this->assertSame( 3, $summary['streak'] );
+		$this->assertTrue( $summary['across_sites'] );
+		$this->assertEqualsCanonicalizing( [ '2026-03-02', '2026-02-28', '2026-03-01' ], $summary['recent_days'] );
+	}
+
+	public function testGetSummary_AccountDaysChangedSinceCached_Recalculates(): void {
+		$this->goal_settings->method( 'goal' )->willReturn( Goal::daily() );
+		$this->transient->method( 'get_transient' )->willReturn(
+			[
+				'key'     => '2026-03-02|daily|1|d41d8cd98f00b204e9800998ecf8427e|-',
+				'summary' => [ 'streak' => 1 ],
+			]
+		);
+		$this->post_dates->method( 'get_dates' )->willReturn( [ '2026-03-02' ] );
+		$this->account_days = [ '2026-03-01' ];
+
+		$summary = ( new Streak( $this->post_dates, null, $this->goal_settings ) )->get_summary();
+
+		$this->assertSame( 2, $summary['streak'] );
 	}
 
 	public function testSaveGoal_Always_SavesItAndClearsTheCache(): void {

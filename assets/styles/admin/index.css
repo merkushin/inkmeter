@@ -78,7 +78,8 @@
   font-size: 14px;
   line-height: 1.7;
 }
-.inkmeter-panel.notice .inkmeter-panel__freezes {
+.inkmeter-panel.notice .inkmeter-panel__freezes,
+.inkmeter-panel.notice .inkmeter-panel__sites {
   margin: 8px 0 0;
   color: var(--inkmeter-muted);
   font-size: 13px;

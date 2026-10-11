@@ -49,6 +49,7 @@ class ProTest extends TestCase {
 		$pro->init();
 
 		$this->assertSame( [ $pro, 'frozen_periods' ], $filters[ Streak::FROZEN_FILTER ] );
+		$this->assertSame( [ $pro, 'account_days' ], $filters[ Streak::ACCOUNT_DAYS_FILTER ] );
 	}
 
 	public function testFrozenPeriods_ProWithFreezes_ReturnsThemForTheUnit(): void {
@@ -90,7 +91,7 @@ class ProTest extends TestCase {
 		$this->assertNull( $pro->freezes_left() );
 	}
 
-	public function testHistoryDays_WithHistory_ReturnsTheAccountsDays(): void {
+	public function testAccountDays_WithHistory_ReturnsTheAccountsDays(): void {
 		$this->connection->connect(
 			'sfs_token',
 			'writer@example.com',
@@ -99,12 +100,12 @@ class ProTest extends TestCase {
 				'features' => [ 'history' ],
 			]
 		);
-		$this->connection->record_streak( [ 'history_days' => [ '2026-10-07', 8, '2026-10-08' ] ] );
+		$this->connection->record_streak( [ 'account_days' => [ '2026-10-07', 8, '2026-10-08' ] ] );
 
-		$this->assertSame( [ '2026-10-07', '2026-10-08' ], ( new Pro( '1.1.0' ) )->history_days() );
+		$this->assertSame( [ '2026-10-07', '2026-10-08' ], ( new Pro( '1.1.0' ) )->account_days( null ) );
 	}
 
-	public function testHistoryDays_WithoutHistory_ReturnsNull(): void {
+	public function testAccountDays_WithoutHistory_LeavesThemAlone(): void {
 		$this->connection->connect(
 			'sfs_token',
 			'writer@example.com',
@@ -113,8 +114,8 @@ class ProTest extends TestCase {
 				'features' => [],
 			]
 		);
-		$this->connection->record_streak( [ 'history_days' => [ '2026-10-08' ] ] );
+		$this->connection->record_streak( [ 'account_days' => [ '2026-10-08' ] ] );
 
-		$this->assertNull( ( new Pro( '1.1.0' ) )->history_days() );
+		$this->assertNull( ( new Pro( '1.1.0' ) )->account_days( null ) );
 	}
 }
