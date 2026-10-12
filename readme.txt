@@ -26,6 +26,10 @@ A streak stays alive until the end of the day after your last post, so you alway
 
 Not everyone publishes every day. Under **Change goal** in the panel, an administrator can pick a goal for the site: publish every day, or on 1 to 6 days a week. With a weekly goal, the streak counts weeks in a row that met it, the panel shows how many days this week had a post, and the current week keeps the streak alive until it ends. Weeks start on the day set in **Settings → General → Week Starts On**.
 
+= Counting drafts =
+
+Writing doesn't always end in a published post the same day. Under **Change goal**, an administrator can also choose to count days spent working on a draft: any day you save changes to a post that isn't published yet counts like a day you published. It's off unless you turn it on, and the panel then says "wrote" instead of "published". Opening the editor without saving doesn't count.
+
 There is nothing else to configure. The panel only appears on the Posts list screen, each user can hide it under **Screen Options**, and the plugin loads nothing on the front end of your site.
 
 = Inkmeter Pro (optional) =
@@ -49,7 +53,7 @@ If you connect to Inkmeter Pro, the data described under External services is se
 Inkmeter Pro, which is optional, uses a web service at streakfire.org, run by Dmitrii Merkushin. Nothing is sent to it unless an administrator connects the site under **Settings → Inkmeter**.
 
 * **When connecting:** your browser opens streakfire.org, where you enter your email address; the plugin then sends this site's address and timezone to api.streakfire.org.
-* **After connecting:** a minute after posts or the writing goal change, and once a day, the plugin sends api.streakfire.org the dates on which this site published at least one post, its timezone, its writing goal and the first day of its week. It never sends your posts' titles, content or any other details about them.
+* **After connecting:** a minute after posts or the writing goal change, and once a day, the plugin sends api.streakfire.org the dates on which this site published at least one post (and, if you count drafts, the dates you worked on one), its timezone, its writing goal and the first day of its week. It never sends your posts' titles, content or any other details about them.
 * **When you open Settings → Inkmeter, change reminders, upgrade or manage your subscription:** the plugin asks api.streakfire.org for your plan, reminder settings, streak, the plans on offer, and checkout or billing links. Payments happen on Lemon Squeezy, the service's reseller.
 * **When you disconnect or delete the plugin:** the plugin tells api.streakfire.org to revoke this site's access.
 
@@ -77,7 +81,7 @@ Yes. Choose a weekly goal, from 1 to 6 days a week, under **Change goal** in the
 
 = Do scheduled, draft or private posts count? =
 
-No. Only published posts count. A scheduled post counts on the day it is published.
+By default, only published posts count, and a scheduled post counts on the day it is published. If you turn on counting drafts under **Change goal**, the days you save changes to a draft, pending or scheduled post count too. Private posts never count.
 
 = Do pages or custom post types count? =
 
@@ -93,7 +97,7 @@ Anyone who can open the Posts list in the dashboard.
 
 = What does Inkmeter Pro send? =
 
-Only this site's address, its timezone, your writing goal, the first day of your week and the dates you published on, so it can tell whether your goal needs a post today. Never your posts or anything about them. See **External services** above.
+Only this site's address, its timezone, your writing goal, the first day of your week and the dates you published on (plus the dates you worked on drafts, if you count them), so it can tell whether your goal needs a post today. Never your posts or anything about them. See **External services** above.
 
 = Can I hide the panel? =
 

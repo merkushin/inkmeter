@@ -11,6 +11,7 @@ use Merkushin\Inkmeter\Pro\Api;
 use Merkushin\Inkmeter\Pro\Connection;
 use Merkushin\Inkmeter\Pro\DaysSync;
 use Merkushin\Inkmeter\Goal;
+use Merkushin\Inkmeter\DraftDates;
 use Merkushin\Inkmeter\GoalSettings;
 use Merkushin\Inkmeter\PublishedPostDates;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -130,6 +131,7 @@ class DaysSyncTest extends TestCase {
 						'days' => 3,
 					],
 					'week_starts_on' => 0,
+					'counts_drafts'  => false,
 				]
 			)
 			->willReturn(
@@ -248,6 +250,30 @@ class DaysSyncTest extends TestCase {
 
 		$this->assertSame( [ $sync, 'schedule_soon' ], $registered['add_option_inkmeter_goal'] );
 		$this->assertSame( [ $sync, 'schedule_soon' ], $registered['update_option_inkmeter_goal'] );
+		$this->assertSame( [ $sync, 'schedule_soon' ], $registered['update_option_inkmeter_count_drafts'] );
+	}
+
+	public function testSync_CountingDrafts_SendsTheDraftDaysToo(): void {
+		$this->connection->connect( 'sfs_token', 'writer@example.com', [] );
+		$this->post_dates->method( 'get_dates' )->willReturn( [ '2026-10-09', '2026-10-07' ] );
+		$this->goal_settings->method( 'counts_drafts' )->willReturn( true );
+		$drafts = $this->createMock( DraftDates::class );
+		$drafts->method( 'get_dates' )->willReturn( [ '2026-10-08', '2026-10-07' ] );
+		$sent = null;
+		$this->api->method( 'request' )->willReturnCallback(
+			function ( string $method, string $path, string $token, array $body ) use ( &$sent ): array {
+				$sent = $body;
+				return [
+					'status' => 200,
+					'data'   => [],
+				];
+			}
+		);
+
+		( new DaysSync( $this->api, $this->connection, $this->post_dates, $this->goal_settings, $drafts ) )->sync();
+
+		$this->assertSame( [ '2026-10-09', '2026-10-08', '2026-10-07' ], $sent['days'] );
+		$this->assertTrue( $sent['counts_drafts'] );
 	}
 
 	public function testScheduleSoon_NotConnected_DoesNothing(): void {

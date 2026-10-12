@@ -104,17 +104,30 @@ class GoalFormTest extends TestCase {
 		$this->capabilities->method( 'current_user_can' )->with( 'manage_options' )->willReturn( true );
 		$this->nonces->expects( $this->once() )->method( 'check_admin_referer' )->with( 'inkmeter_goal' );
 		$this->nonces->method( 'wp_get_referer' )->willReturn( 'https://example.com/wp-admin/edit.php?post_status=draft' );
-		$_POST = [ 'inkmeter_goal' => 'weekly-3' ];
+		$_POST = [
+			'inkmeter_goal'         => 'weekly-3',
+			'inkmeter_count_drafts' => '1',
+		];
 
 		$this->streak
 			->expects( $this->once() )
 			->method( 'save_goal' )
 			->with( $this->callback( fn( Goal $goal ): bool => 'weekly-3' === $goal->key() ) );
+		$this->streak->expects( $this->once() )->method( 'save_counts_drafts' )->with( true );
 
 		$this->create_form()->save();
 
 		$this->assertSame( [ 'https://example.com/wp-admin/edit.php?post_status=draft' ], $this->redirects );
 		$this->assertSame( 1, $this->terminated );
+	}
+
+	public function testSave_DraftsUnchecked_TurnsThemOff(): void {
+		$this->capabilities->method( 'current_user_can' )->willReturn( true );
+		$_POST = [ 'inkmeter_goal' => 'daily' ];
+
+		$this->streak->expects( $this->once() )->method( 'save_counts_drafts' )->with( false );
+
+		$this->create_form()->save();
 	}
 
 	public function testSave_InvalidGoal_SavesNothing(): void {

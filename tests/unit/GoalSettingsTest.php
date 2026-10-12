@@ -54,6 +54,18 @@ class GoalSettingsTest extends TestCase {
 		( new GoalSettings() )->save( Goal::weekly( 4 ) );
 	}
 
+	public function testCountsDrafts_NothingSaved_IsOff(): void {
+		$this->options->method( 'get_option' )->with( GoalSettings::DRAFTS_OPTION, '0' )->willReturn( '0' );
+
+		$this->assertFalse( ( new GoalSettings() )->counts_drafts() );
+	}
+
+	public function testSaveCountsDrafts_On_StoresOneAutoloaded(): void {
+		$this->options->expects( $this->once() )->method( 'update_option' )->with( GoalSettings::DRAFTS_OPTION, '1', true );
+
+		( new GoalSettings() )->save_counts_drafts( true );
+	}
+
 	/**
 	 * @dataProvider provide_week_starts
 	 *

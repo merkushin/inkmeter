@@ -50,3 +50,10 @@ test( 'celebration after publishing', () => {
 	assert.deepEqual( celebration( weekly( { streak: 3, next_milestone: 4, period_days: 2 } ), weekly( { streak: 4, next_milestone: 8, period_days: 3, is_goal_met: true } ) ), { milestone: true, message: '4 weeks in a row! Next milestone: 8 weeks.' } );
 	assert.deepEqual( celebration( weekly( { streak: 3, period_days: 1 } ), weekly( { streak: 3, period_days: 2 } ) ), { milestone: false, message: '2 of 3 days this week.' } );
 } );
+
+test( 'counting drafts says "wrote"', () => {
+	assert.equal( prePublishMessage( daily( { streak: 2, is_active_today: true, is_goal_met: true, counts_drafts: true } ), false ), 'You already wrote today. Your streak is 2 days.' );
+	assert.equal( prePublishMessage( weekly( { streak: 1, is_active_today: true, period_days: 1, counts_drafts: true } ), false ), 'You already wrote today, so publishing doesn\'t add a day: 1 of 3 days this week.' );
+	assert.equal( statusLine( daily( { counts_drafts: true } ) ), 'Write today to start a streak' );
+	assert.equal( statusLine( daily( { streak: 7, counts_drafts: true } ) ), '7-day streak · write today to keep it' );
+} );

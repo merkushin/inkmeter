@@ -159,6 +159,18 @@
   gap: 8px;
   align-items: center;
 }
+/* The drafts checkbox gets its own line, between the goal and the button. */
+.inkmeter-panel__drafts {
+  display: flex;
+  flex-basis: 100%;
+  gap: 6px;
+  align-items: center;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+.inkmeter-panel__drafts input[type="checkbox"] {
+  margin: 0;
+}
 .inkmeter-panel__goal-change select {
   min-height: 30px;
 }
