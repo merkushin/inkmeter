@@ -23,7 +23,7 @@ In a development checkout the plugin loads `vendor/autoload.php`, so it can be s
 
 ### Inkmeter Pro
 
-The optional Pro features (Settings → Inkmeter) talk to the service at streakfire.org, whose server lives in [creogen/streakfire](https://github.com/creogen/streakfire). To develop against a local copy of it, add to `wp-config.php`:
+The optional Pro features (Settings → Inkmeter) talk to the service at inkmeter.com, whose server lives in [creogen/streakfire](https://github.com/creogen/streakfire). To develop against a local copy of it, add to `wp-config.php`:
 
 ```php
 define( 'INKMETER_API_URL', 'http://localhost:8080' );  // Called by WordPress itself (from Docker: http://host.docker.internal:8080).
