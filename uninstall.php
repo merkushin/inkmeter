@@ -14,7 +14,7 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 	// Inkmeter Pro. Revoke the site's token, best effort, so it can't be used again.
 	$connection = get_option( 'inkmeter_connection' );
 	if ( is_array( $connection ) && ! empty( $connection['token'] ) && is_string( $connection['token'] ) ) {
-		$api_url = defined( 'INKMETER_API_URL' ) ? (string) INKMETER_API_URL : 'https://api.streakfire.org';
+		$api_url = defined( 'INKMETER_API_URL' ) ? (string) INKMETER_API_URL : 'https://api.inkmeter.com';
 		wp_remote_request(
 			$api_url . '/v1/site',
 			[

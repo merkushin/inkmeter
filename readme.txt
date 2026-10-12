@@ -50,14 +50,14 @@ If you connect to Inkmeter Pro, the data described under External services is se
 
 = External services =
 
-Inkmeter Pro, which is optional, uses a web service at streakfire.org, run by Dmitrii Merkushin. Nothing is sent to it unless an administrator connects the site under **Settings → Inkmeter**.
+Inkmeter Pro, which is optional, uses a web service at inkmeter.com, run by Dmitrii Merkushin. Nothing is sent to it unless an administrator connects the site under **Settings → Inkmeter**.
 
-* **When connecting:** your browser opens streakfire.org, where you enter your email address; the plugin then sends this site's address and timezone to api.streakfire.org.
-* **After connecting:** a minute after posts or the writing goal change, and once a day, the plugin sends api.streakfire.org the dates on which this site published at least one post (and, if you count drafts, the dates you worked on one), its timezone, its writing goal and the first day of its week. It never sends your posts' titles, content or any other details about them.
-* **When you open Settings → Inkmeter, change reminders, upgrade or manage your subscription:** the plugin asks api.streakfire.org for your plan, reminder settings, streak, the plans on offer, and checkout or billing links. Payments happen on Lemon Squeezy, the service's reseller.
-* **When you disconnect or delete the plugin:** the plugin tells api.streakfire.org to revoke this site's access.
+* **When connecting:** your browser opens inkmeter.com, where you enter your email address; the plugin then sends this site's address and timezone to api.inkmeter.com.
+* **After connecting:** a minute after posts or the writing goal change, and once a day, the plugin sends api.inkmeter.com the dates on which this site published at least one post (and, if you count drafts, the dates you worked on one), its timezone, its writing goal and the first day of its week. It never sends your posts' titles, content or any other details about them.
+* **When you open Settings → Inkmeter, change reminders, upgrade or manage your subscription:** the plugin asks api.inkmeter.com for your plan, reminder settings, streak, the plans on offer, and checkout or billing links. Payments happen on Lemon Squeezy, the service's reseller.
+* **When you disconnect or delete the plugin:** the plugin tells api.inkmeter.com to revoke this site's access.
 
-The service's [Terms of service](https://streakfire.org/terms) and [Privacy policy](https://streakfire.org/privacy).
+The service's [Terms of service](https://inkmeter.com/terms) and [Privacy policy](https://inkmeter.com/privacy).
 
 = Source code =
 

@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Settings → Inkmeter: connects the site to Inkmeter Pro and manages it.
  *
- * Connecting: the admin is sent to streakfire.org/connect with a random state,
+ * Connecting: the admin is sent to inkmeter.com/connect with a random state,
  * confirms by email, and comes back here with a one-time code and the state.
  * The code is exchanged for the site's token server to server, so the token
  * never passes through the browser. Nothing is sent to Inkmeter before that.
@@ -189,7 +189,7 @@ class SettingsPage {
 	}
 
 	/**
-	 * Sends the admin to streakfire.org to confirm the connection by email.
+	 * Sends the admin to inkmeter.com to confirm the connection by email.
 	 */
 	public function connect(): void {
 		$this->authorize( 'connect' );
@@ -211,7 +211,7 @@ class SettingsPage {
 	}
 
 	/**
-	 * Finishes connecting when streakfire.org sends the admin back with a code.
+	 * Finishes connecting when inkmeter.com sends the admin back with a code.
 	 * Runs when the settings page loads, before any output.
 	 */
 	public function handle_return(): void {
@@ -535,10 +535,10 @@ class SettingsPage {
 	}
 
 	/**
-	 * Redirects to streakfire.org or Lemon Squeezy, which wp_safe_redirect() would refuse.
+	 * Redirects to inkmeter.com or Lemon Squeezy, which wp_safe_redirect() would refuse.
 	 */
 	private function redirect_away( string $url ): void {
-		$this->redirects->wp_redirect( $url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentionally external: streakfire.org or Lemon Squeezy.
+		$this->redirects->wp_redirect( $url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentionally external: inkmeter.com or Lemon Squeezy.
 		( $this->terminate )();
 	}
 

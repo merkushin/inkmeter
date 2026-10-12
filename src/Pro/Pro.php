@@ -16,9 +16,9 @@ defined( 'ABSPATH' ) || exit;
  * plugin at another Inkmeter server, e.g. a local one during development.
  */
 class Pro {
-	public const API_URL = 'https://api.streakfire.org';
+	public const API_URL = 'https://api.inkmeter.com';
 
-	public const SITE_URL = 'https://streakfire.org';
+	public const SITE_URL = 'https://inkmeter.com';
 
 	/**
 	 * @var Capabilities

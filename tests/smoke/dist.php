@@ -440,7 +440,7 @@ if ( ! isset( $GLOBALS['smoke_cron']['inkmeter_sync_days'] ) ) {
 	smoke_fail( 'save_post did not schedule a sync' );
 }
 smoke_do( 'inkmeter_sync_days' );
-if ( [ 'PUT https://api.streakfire.org/v1/days' ] !== $GLOBALS['smoke_requests'] || ! isset( $GLOBALS['smoke_options']['inkmeter_connection']['synced_at'] ) ) {
+if ( [ 'PUT https://api.inkmeter.com/v1/days' ] !== $GLOBALS['smoke_requests'] || ! isset( $GLOBALS['smoke_options']['inkmeter_connection']['synced_at'] ) ) {
 	smoke_fail( 'the sync did not send the days: ' . implode( ', ', $GLOBALS['smoke_requests'] ) );
 }
 
