@@ -66,5 +66,7 @@ This creates `inkmeter.zip`. The build happens in `build/inkmeter`, so the worki
 1. Bump the version in `inkmeter.php` (header), `readme.txt` (`Stable tag`), `Plugin::VERSION` and `package.json`, and add a changelog entry to `readme.txt`. `make version-check` confirms they match.
 2. Push a tag with that version, e.g. `v1.0.1`. The release workflow builds the zip, deploys it to WordPress.org SVN with the listing assets from `.wordpress-org/`, and creates a GitHub release with the zip attached.
 
+`.wordpress-org/blueprints/blueprint.json` powers the **Live Preview** button on the plugin page: it opens the released plugin in [WordPress Playground](https://playground.wordpress.net/) on a blog with an 8-day streak and months of posts, with outgoing requests off so nobody connects a preview site to Inkmeter Pro. To try a change, open `https://playground.wordpress.net/#` followed by the URL-encoded JSON.
+
 The workflow needs the `SVN_USERNAME` and `SVN_PASSWORD` repository secrets (your WordPress.org username and SVN password). The very first version is submitted by hand at [wordpress.org/plugins/developers/add](https://wordpress.org/plugins/developers/add/); tags only deploy after the plugin is approved.
 
