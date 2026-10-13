@@ -12,25 +12,37 @@ Requirements: PHP 7.4+, Composer 2, Node.js 20.9+, WP-CLI (for translations).
 make install   # composer install && npm ci
 make build-js  # build assets into assets/dist
 make test      # run PHPUnit
+npm test       # run the JavaScript tests (Node 22+)
 make smoke     # smoke test the release build from make dist
 make lint      # WordPress Coding Standards and PHP 7.4+ compatibility (make lint-fix to auto-fix)
 ```
 
-CI (`.github/workflows/ci.yml`) runs the linter, checks that `languages/inkmeter.pot` is up to date and that versions match, runs the tests on PHP 7.4–8.4, builds the plugin (uploaded as the `inkmeter` artifact) and runs [Plugin Check](https://wordpress.org/plugins/plugin-check/) on the build.
+CI (`.github/workflows/ci.yml`) runs the linter, checks the translatable strings and that versions match, runs the tests on PHP 7.4–8.4, builds the plugin (uploaded as the `inkmeter` artifact) and runs [Plugin Check](https://wordpress.org/plugins/plugin-check/) on the build.
 
 In a development checkout the plugin loads `vendor/autoload.php`, so it can be symlinked into a local WordPress install as-is.
+
+### Inkmeter Pro
+
+The optional Pro features (Settings → Inkmeter) talk to the service at inkmeter.com, whose server lives in [creogen/streakfire](https://github.com/creogen/streakfire). To develop against a local copy of it, add to `wp-config.php`:
+
+```php
+define( 'INKMETER_API_URL', 'http://localhost:8080' );  // Called by WordPress itself (from Docker: http://host.docker.internal:8080).
+define( 'INKMETER_SITE_URL', 'http://localhost:8080' ); // Opened in the browser for connecting.
+```
+
+Without an Emailit key, the local server prints the connect email, with its confirmation link, to its log.
 
 ### Translations
 
 All user-facing text lives in `src/views/` and uses the `inkmeter` text domain. The plugin ships no translation files: WordPress.org asks plugins to translate through [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/inkmeter/), and WordPress downloads and loads those language packs automatically.
 
-`languages/` holds the template (`inkmeter.pot`) and draft `.po` files for de_DE, es_ES, fr_FR, it_IT, ja, nl_NL, pl_PL, pt_BR, pt_PT, ru_RU, tr_TR, uk and zh_CN. They are not part of the release; they can be imported into translate.wordpress.org once the plugin is approved.
-
-After changing strings, regenerate the template and merge it into every `.po` file (needs [WP-CLI](https://wp-cli.org/)):
+The repository has no translation template either, since translate.wordpress.org builds its own from the released code. To get one for a manual translation, generate `build/inkmeter.pot` (needs [WP-CLI](https://wp-cli.org/)):
 
 ```bash
 make i18n
 ```
+
+`make i18n-check`, which CI runs, fails on WP-CLI warnings about the strings, such as a string with placeholders but no `translators:` comment.
 
 ### Building a release
 
@@ -53,6 +65,8 @@ This creates `inkmeter.zip`. The build happens in `build/inkmeter`, so the worki
 
 1. Bump the version in `inkmeter.php` (header), `readme.txt` (`Stable tag`), `Plugin::VERSION` and `package.json`, and add a changelog entry to `readme.txt`. `make version-check` confirms they match.
 2. Push a tag with that version, e.g. `v1.0.1`. The release workflow builds the zip, deploys it to WordPress.org SVN with the listing assets from `.wordpress-org/`, and creates a GitHub release with the zip attached.
+
+`.wordpress-org/blueprints/blueprint.json` powers the **Live Preview** button on the plugin page: it opens the released plugin in [WordPress Playground](https://playground.wordpress.net/) on a blog with an 8-day streak and months of posts, with outgoing requests off so nobody connects a preview site to Inkmeter Pro. To try a change, open `https://playground.wordpress.net/#` followed by the URL-encoded JSON.
 
 The workflow needs the `SVN_USERNAME` and `SVN_PASSWORD` repository secrets (your WordPress.org username and SVN password). The very first version is submitted by hand at [wordpress.org/plugins/developers/add](https://wordpress.org/plugins/developers/add/); tags only deploy after the plugin is approved.
 

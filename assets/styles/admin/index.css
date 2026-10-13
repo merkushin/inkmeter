@@ -78,6 +78,102 @@
   font-size: 14px;
   line-height: 1.7;
 }
+.inkmeter-panel.notice .inkmeter-panel__freezes,
+.inkmeter-panel.notice .inkmeter-panel__sites {
+  margin: 8px 0 0;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+.inkmeter-panel__freezes::before {
+  content: "\2744\FE0F";
+  margin-right: 6px;
+}
+.inkmeter-panel.notice .inkmeter-panel__reminders {
+  margin: 0;
+  font-size: 13px;
+}
+.inkmeter-panel__reminders a {
+  color: var(--inkmeter-text);
+  text-decoration-color: var(--inkmeter-strong);
+  text-underline-offset: 3px;
+}
+.inkmeter-panel__dismiss {
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--inkmeter-muted);
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.inkmeter-panel__dismiss:hover,
+.inkmeter-panel__dismiss:focus {
+  color: var(--inkmeter-text);
+}
+.inkmeter-panel__reminders[hidden] {
+  display: none;
+}
+.inkmeter-panel__reminders a:hover,
+.inkmeter-panel__reminders a:focus {
+  color: var(--inkmeter-text);
+  text-decoration-color: currentColor;
+}
+.inkmeter-panel__goal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-top: 10px;
+  color: var(--inkmeter-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inkmeter-panel__goal-change summary {
+  color: var(--inkmeter-muted);
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: var(--inkmeter-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+.inkmeter-panel__goal-change summary::-webkit-details-marker {
+  display: none;
+}
+.inkmeter-panel__goal-change summary:hover,
+.inkmeter-panel__goal-change summary:focus {
+  color: var(--inkmeter-text);
+}
+.inkmeter-panel__goal-change[open] summary {
+  display: none;
+}
+/* While choosing, the select already shows the current goal. */
+.inkmeter-panel__goal:has(.inkmeter-panel__goal-change[open]) > span {
+  display: none;
+}
+.inkmeter-panel__goal-change form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+/* The drafts checkbox gets its own line, between the goal and the button. */
+.inkmeter-panel__drafts {
+  display: flex;
+  flex-basis: 100%;
+  gap: 6px;
+  align-items: center;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+.inkmeter-panel__drafts input[type="checkbox"] {
+  margin: 0;
+}
+.inkmeter-panel__goal-change select {
+  min-height: 30px;
+}
 .inkmeter-panel__stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -196,4 +292,86 @@
   .inkmeter-panel__score-value {
     font-size: 56px;
   }
+}
+/* History calendar: a column per week, a cell per day. */
+.inkmeter-panel__history {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--inkmeter-soft);
+}
+.inkmeter-history__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 10px;
+}
+.inkmeter-history__title {
+  color: var(--inkmeter-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.inkmeter-history__summary {
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+/* Right to left so a grid wider than the screen opens on the latest weeks. */
+.inkmeter-history__grid {
+  overflow-x: auto;
+  padding-bottom: 4px;
+  direction: rtl;
+}
+.inkmeter-history__grid > * {
+  direction: ltr;
+}
+.inkmeter-history__months,
+.inkmeter-history__weeks {
+  display: flex;
+  gap: 3px;
+  width: max-content;
+}
+.inkmeter-history__months span {
+  width: 11px;
+  overflow: visible;
+  white-space: nowrap;
+  color: var(--inkmeter-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+.inkmeter-history__week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.inkmeter-history__day {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--inkmeter-soft);
+}
+.inkmeter-history__day.is-published {
+  background: #ffd166;
+}
+.inkmeter-history__day.is-frozen {
+  background: #9ad8ff;
+}
+.inkmeter-history__day.is-future {
+  background: rgba(255, 255, 255, 0.05);
+}
+.inkmeter-history__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+  color: var(--inkmeter-muted);
+  font-size: 12px;
+}
+.inkmeter-history__legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }

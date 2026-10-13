@@ -1,0 +1,40 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "Inkmeter preview",
+		"description": "A blog with an 8-day writing streak, ready for today's post.",
+		"author": "merkushin",
+		"categories": [ "Writing" ]
+	},
+	"landingPage": "/wp-admin/edit.php",
+	"preferredVersions": {
+		"php": "8.3",
+		"wp": "latest"
+	},
+	"login": true,
+	"features": {
+		"networking": false
+	},
+	"steps": [
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"blogname": "A Writing Habit"
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "inkmeter"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n// Posts on the 8 days before today, so the streak is alive and today still needs a post,\n// and on scattered days over the past months for the history calendar.\nwp_delete_post( 1, true );\n$days = array( 1, 2, 3, 4, 5, 6, 7, 8, 11, 13, 16, 20, 23, 27, 30, 34, 38, 41, 45, 52, 55, 61, 66, 73, 79, 86, 94, 101, 115, 128, 140, 157 );\n$titles = array( 'What I learned from writing every day', 'A short note on drafts', 'Why I keep a reading list', 'Small habits, big results', 'Notes from a morning walk', 'The book that changed my mind', 'On finishing things', 'Three ideas I want to explore', 'How I plan a week of posts', 'Writing in short bursts', 'A list of questions worth asking', 'What a blank page taught me' );\n$today = new DateTimeImmutable( 'now', wp_timezone() );\nforeach ( $days as $i => $ago ) {\n\t$date = $today->modify( '-' . $ago . ' days' )->setTime( 9 + $i % 8, ( $i * 7 ) % 60 );\n\twp_insert_post(\n\t\tarray(\n\t\t\t'post_title'    => $titles[ $i % count( $titles ) ],\n\t\t\t'post_content'  => '<!-- wp:paragraph --><p>A few paragraphs written to keep the streak going.</p><!-- /wp:paragraph -->',\n\t\t\t'post_status'   => 'publish',\n\t\t\t'post_date'     => $date->format( 'Y-m-d H:i:s' ),\n\t\t\t'post_date_gmt' => get_gmt_from_date( $date->format( 'Y-m-d H:i:s' ) ),\n\t\t)\n\t);\n}\ndelete_transient( 'inkmeter_summary' );\n"
+		}
+	]
+}

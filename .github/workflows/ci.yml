@@ -43,7 +43,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           "$HOME/.local/bin/wp" --info
 
-      - name: Translation template is up to date
+      - name: Translatable strings
         run: make i18n-check
 
       - name: Versions match
@@ -91,6 +91,9 @@ jobs:
           cache: npm
 
       - run: make dist
+
+      - name: JavaScript tests
+        run: npm test
 
       - name: Smoke test the build
         run: make smoke
