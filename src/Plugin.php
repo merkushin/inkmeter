@@ -35,9 +35,19 @@ class Plugin {
 	public const PRO_LINK_SETTING = 'inkmeter_pro_link';
 
 	/**
+	 * User setting: 'open' while the user keeps the panel's details open.
+	 */
+	public const DETAILS_SETTING = 'inkmeter_details';
+
+	/**
 	 * Weeks in the history calendar: the past year.
 	 */
 	private const HISTORY_WEEKS = 53;
+
+	/**
+	 * Days shown in the panel's bar, ending today.
+	 */
+	private const RECENT_DAYS = 14;
 
 	/**
 	 * Main plugin file path.
@@ -188,6 +198,8 @@ class Plugin {
 			$this->streak->week_start(),
 			self::HISTORY_WEEKS
 		);
+		$recent_days          = $this->recent_days( $history );
+		$is_details_open      = 'open' === $this->user_settings->get_user_setting( self::DETAILS_SETTING, 'closed' );
 		$history_published    = $this->format_number( $history['published'] );
 		$history_days         = $this->format_number( $history['days'] );
 		$history_has_frozen   = [] !== array_filter(
@@ -264,6 +276,23 @@ class Plugin {
 	}
 
 	/**
+	 * Prints the panel bar's last days, a cell per day, today last.
+	 *
+	 * @param array<int, array{date: string, state: string}> $days
+	 */
+	public function render_recent_days( array $days ): void {
+		$last = count( $days ) - 1;
+		foreach ( $days as $index => $day ) {
+			printf(
+				'<span class="inkmeter-history__day is-%1$s%2$s" title="%3$s"></span>',
+				esc_attr( $day['state'] ),
+				$last === $index ? ' is-today' : '',
+				esc_attr( $this->history_title( $day['date'], $day['state'] ) )
+			);
+		}
+	}
+
+	/**
 	 * Prints the goal choices for the panel's goal form.
 	 */
 	public function render_goal_options( Goal $selected ): void {
@@ -308,6 +337,24 @@ class Plugin {
 		}
 
 		return 0 === $streak ? 'start' : 'alive';
+	}
+
+	/**
+	 * The calendar's last days up to today, for the panel's bar.
+	 *
+	 * @param array{weeks: array<int, array{month: ?string, days: array<int, array{date: string, state: string}>}>} $history
+	 *
+	 * @return array<int, array{date: string, state: string}>
+	 */
+	private function recent_days( array $history ): array {
+		$days = array_filter(
+			array_merge( ...array_column( $history['weeks'], 'days' ) ),
+			static function ( array $day ): bool {
+				return HistoryCalendar::FUTURE !== $day['state'];
+			}
+		);
+
+		return array_values( array_slice( $days, -self::RECENT_DAYS ) );
 	}
 
 	private function format_number( int $number ): string {
