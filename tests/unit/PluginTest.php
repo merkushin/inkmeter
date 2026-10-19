@@ -214,7 +214,7 @@ class PluginTest extends TestCase {
 		$this->assertStringContainsString( 'Last published 01.03.2026', $text );
 		$this->assertStringContainsString( 'Next milestone 1.250 days', $text );
 		$this->assertStringContainsString( 'Needs a post today', $text );
-		$this->assertStringContainsString( 'Milestone progress 99%', $text );
+		$this->assertStringContainsString( 'Next milestone 1.250 days 99%', $text );
 	}
 
 	public function testRenderStreakPanel_NoPosts_RendersEmptyState(): void {
@@ -241,14 +241,14 @@ class PluginTest extends TestCase {
 		$this->assertStringContainsString( 'Start your next streak', $text );
 		$this->assertStringContainsString( 'Current run 0 days', $text );
 		$this->assertStringContainsString( 'Last published No published posts yet', $text );
-		$this->assertStringContainsString( 'Milestone progress 0%', $text );
+		$this->assertStringContainsString( 'Next milestone 3 days 0%', $text );
 	}
 
 	public function testRenderStreakPanel_PanelVisible_RendersWithoutHiddenAttribute(): void {
 		$html = $this->render_panel();
 
 		$this->assertStringContainsString( 'id="inkmeter-panel"', $html );
-		$this->assertStringNotContainsString( ' hidden', $html );
+		$this->assertDoesNotMatchRegularExpression( '/<div id="inkmeter-panel"[^>]* hidden>/', $html );
 	}
 
 	public function testRenderStreakPanel_PanelHiddenInScreenOptions_RendersHidden(): void {
@@ -410,12 +410,50 @@ class PluginTest extends TestCase {
 		);
 
 		$this->assertStringContainsString( 'A streak freeze saved yesterday. 1 streak freeze left this month', $text );
+		$this->assertStringContainsString( 'Needs a post today 1 freeze left', $text, 'the bar counts the freezes too' );
 	}
 
 	public function testRenderStreakPanel_WithoutFreezes_ShowsNoFreezeLine(): void {
 		$this->pro->method( 'freezes_left' )->willReturn( null );
 
-		$this->assertStringNotContainsString( 'inkmeter-panel__freezes', $this->render_panel() );
+		$html = $this->render_panel();
+
+		$this->assertStringNotContainsString( 'inkmeter-panel__freezes', $html );
+		$this->assertStringNotContainsString( 'inkmeter-panel__freeze-count', $html );
+	}
+
+	public function testRenderStreakPanel_DetailsByDefault_RendersThemClosed(): void {
+		$html = $this->render_panel();
+
+		$this->assertStringContainsString( 'id="inkmeter-details-toggle" aria-expanded="false"', $html );
+		$this->assertStringContainsString( 'id="inkmeter-panel-details" hidden>', $html );
+	}
+
+	public function testRenderStreakPanel_DetailsKeptOpen_RendersThemOpen(): void {
+		$this->use_user_settings( [ Plugin::DETAILS_SETTING => 'open' ] );
+		ServiceFactory::set_custom_user_settings( $this->user_settings );
+
+		$html = $this->render_panel();
+
+		$this->assertStringContainsString( 'id="inkmeter-details-toggle" aria-expanded="true"', $html );
+		$this->assertStringContainsString( 'id="inkmeter-panel-details">', $html );
+	}
+
+	public function testRenderStreakPanel_RecentDays_ShowsTheLast14DaysEndingToday(): void {
+		$this->dates->method( 'current_time' )->willReturn( '2026-03-05' );
+		$this->dates->method( 'wp_date' )->willReturnCallback(
+			function ( string $format, int $timestamp ): string {
+				return gmdate( 'M j', $timestamp );
+			}
+		);
+		$html = $this->render_panel_with( [ 'recent_days' => [ '2026-02-20', '2026-03-04' ] ] );
+
+		$this->assertSame( 1, preg_match( '/<div class="inkmeter-panel__recent-days"[^>]*>(.*?)<\/div>/s', $html, $recent ) );
+		$this->assertSame( 14, substr_count( $recent[1], 'inkmeter-history__day' ) );
+		$this->assertStringContainsString( 'class="inkmeter-history__day is-published" title="Feb 20: published"', $recent[1], 'the first of the 14 days' );
+		$this->assertStringContainsString( 'class="inkmeter-history__day is-published" title="Mar 4: published"', $recent[1] );
+		$this->assertStringContainsString( 'class="inkmeter-history__day is-empty is-today" title="Mar 5: no post"', $recent[1] );
+		$this->assertStringNotContainsString( 'Feb 19', $recent[1] );
 	}
 
 	public function testRenderStreakPanel_History_ShowsThePastYearWithoutPro(): void {
@@ -428,7 +466,7 @@ class PluginTest extends TestCase {
 			]
 		);
 
-		$this->assertSame( 53 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 3, '53 weeks of days, plus the legend' );
+		$this->assertSame( 53 * 7, substr_count( $html, 'inkmeter-history__day is-' ) - 14 - 3, '53 weeks of days, plus the last 14 days and the legend' );
 		$this->assertStringContainsString( 'Past year', $html );
 		$this->assertStringContainsString( 'Published on 3 of 368 days', $html );
 		$this->assertStringContainsString( 'class="inkmeter-history__day is-frozen" title="Mar 2: covered by a streak freeze"', $html );

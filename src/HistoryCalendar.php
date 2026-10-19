@@ -84,6 +84,12 @@ class HistoryCalendar {
 			];
 		}
 
+		// The first week names its month even mid-month; when the next month starts a week later,
+		// the two labels would overlap, so the next month's label wins.
+		if ( isset( $result['weeks'][1] ) && null !== $result['weeks'][1]['month'] ) {
+			$result['weeks'][0]['month'] = null;
+		}
+
 		return $result;
 	}
 

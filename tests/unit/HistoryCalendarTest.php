@@ -74,4 +74,18 @@ class HistoryCalendarTest extends TestCase {
 			$months
 		);
 	}
+
+	public function testBuild_NextMonthStartsInTheSecondWeek_DropsTheFirstWeeksLabel(): void {
+		// The first week starts on December 22; January 1 falls in the second week.
+		$calendar = ( new HistoryCalendar() )->build( [], [], false, self::TODAY, 1, 11 );
+
+		$this->assertSame(
+			[
+				1 => '2026-01',
+				5 => '2026-02',
+				9 => '2026-03',
+			],
+			array_filter( array_column( $calendar['weeks'], 'month' ) )
+		);
+	}
 }

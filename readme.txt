@@ -12,19 +12,20 @@ Track your writing streak: see how many days in a row you have published a post,
 
 == Description ==
 
-Inkmeter turns publishing into a habit. Open **Posts** in your dashboard and a panel shows:
+Inkmeter turns publishing into a habit. Open **Posts** in your dashboard and a compact panel shows your current streak, whether you have already published today or still need to post to keep it going, your last 14 days and the progress to the next milestone: 3, 7, 14, 30, 50 and 100 days, then every 25 days.
+
+Click **Details** in the panel for more, and it stays open until you close it:
 
 * **Current run**: how many days in a row you have published at least one post.
 * **Last published**: the date of your latest post.
-* **Next milestone**: 3, 7, 14, 30, 50 and 100 days, then every 25 days, with a progress bar.
-* Whether you have already published today, or still need to post to keep the streak going.
+* **Next milestone**: the next streak length to reach.
 * **History**: a calendar of the past year, with the days you published.
 
 A streak stays alive until the end of the day after your last post, so you always have a full day to keep it going. Days follow your site's timezone, and several posts on the same day count as one day.
 
 = Daily or weekly goals =
 
-Not everyone publishes every day. Under **Change goal** in the panel, an administrator can pick a goal for the site: publish every day, or on 1 to 6 days a week. With a weekly goal, the streak counts weeks in a row that met it, the panel shows how many days this week had a post, and the current week keeps the streak alive until it ends. Weeks start on the day set in **Settings → General → Week Starts On**.
+Not everyone publishes every day. Under **Details → Change goal** in the panel, an administrator can pick a goal for the site: publish every day, or on 1 to 6 days a week. With a weekly goal, the streak counts weeks in a row that met it, the panel shows how many days this week had a post, and the current week keeps the streak alive until it ends. Weeks start on the day set in **Settings → General → Week Starts On**.
 
 = Counting drafts =
 
@@ -77,7 +78,7 @@ A calendar day in your site's timezone (**Settings → General → Timezone**) o
 
 = Can I publish less often than every day? =
 
-Yes. Choose a weekly goal, from 1 to 6 days a week, under **Change goal** in the panel. Several posts on the same day still count as one day, so a goal of 3 days a week asks you to publish on 3 different days.
+Yes. Choose a weekly goal, from 1 to 6 days a week, under **Details → Change goal** in the panel. Several posts on the same day still count as one day, so a goal of 3 days a week asks you to publish on 3 different days.
 
 = Do scheduled, draft or private posts count? =
 
@@ -110,6 +111,7 @@ Yes. On the Posts screen, open **Screen Options** at the top right and uncheck *
 == Changelog ==
 
 = 1.1.0 =
+* Changed: a compact panel. One row shows the streak, today's status, the last 14 days and the next milestone; Details opens the rest.
 * New: optional Inkmeter Pro under Settings → Inkmeter: an email reminder before your streak breaks, and streak history kept in your account.
 
 = 1.0.0 =
