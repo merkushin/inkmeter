@@ -106,7 +106,7 @@ Yes. On the Posts screen, open **Screen Options** at the top right and uncheck *
 
 == Screenshots ==
 
-1. The writing streak panel above the Posts list.
+1. The writing streak panel above the Posts list, with Details open: the past year, the goal and the stats.
 
 == Changelog ==
 
