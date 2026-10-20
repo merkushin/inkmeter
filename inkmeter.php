@@ -3,7 +3,7 @@
  * Plugin Name:       Inkmeter
  * Plugin URI:        https://github.com/merkushin/inkmeter
  * Description:       Shows your current writing streak above the Posts list.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            Dmitry Merkushin
@@ -27,3 +27,4 @@ if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) ) {
 }
 
 add_action( 'init', [ new Plugin( __FILE__ ), 'init' ] );
+register_deactivation_hook( __FILE__, [ Pro\DaysSync::class, 'clear_schedule' ] );

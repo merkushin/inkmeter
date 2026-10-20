@@ -27,10 +27,34 @@ function esc_html_e( string $text, string $domain = 'default' ): void {
 	echo esc_html( $text );
 }
 
+function esc_attr_e( string $text, string $domain = 'default' ): void {
+	echo esc_attr( $text );
+}
+
 function checked( $checked, $current = true, bool $display = true ): string {
 	$result = (string) $checked === (string) $current ? ' checked=\'checked\'' : '';
 	if ( $display ) {
 		echo $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed attribute string.
 	}
 	return $result;
+}
+
+function esc_html__( string $text, string $domain = 'default' ): string {
+	return esc_html( $text );
+}
+
+function esc_url( string $url ): string {
+	return htmlspecialchars( $url, ENT_QUOTES );
+}
+
+function selected( $selected, $current = true, bool $display = true ): string {
+	$result = (string) $selected === (string) $current ? ' selected=\'selected\'' : '';
+	if ( $display ) {
+		echo $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed attribute string.
+	}
+	return $result;
+}
+
+function wp_nonce_field( string $action ): void {
+	echo '<input type="hidden" name="_wpnonce" value="nonce-' . esc_attr( $action ) . '" />';
 }

@@ -1,3 +1,5 @@
+/* The streak panel: one bar with the streak, today's status, the last 14 days and the next
+   milestone; Details opens the goal, the stats and the past year below it. */
 .inkmeter-panel {
   --inkmeter-bg: linear-gradient(135deg, #102a43 0%, #1f4b99 52%, #ff7a59 100%);
   --inkmeter-text: #f8fbff;
@@ -6,169 +8,156 @@
   --inkmeter-strong: rgba(255, 255, 255, 0.24);
   color: var(--inkmeter-text);
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
-  gap: 24px;
   margin: 16px 0 24px;
-  padding: 24px 28px;
+  padding: 14px 16px 14px 14px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 16px;
   background: var(--inkmeter-bg);
-  box-shadow: 0 20px 45px rgba(16, 42, 67, 0.18);
+  box-shadow: 0 14px 32px rgba(16, 42, 67, 0.16);
   overflow: hidden;
 }
-/* The panel sets display: grid, which would otherwise override the hidden attribute. */
-.inkmeter-panel[hidden] {
+.inkmeter-panel[hidden],
+.inkmeter-panel__details[hidden],
+.inkmeter-panel__reminders[hidden] {
   display: none;
 }
-.inkmeter-panel::before,
-.inkmeter-panel::after {
+.inkmeter-panel::before {
   content: "";
   position: absolute;
+  top: -60px;
+  right: -30px;
+  width: 170px;
+  height: 170px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   pointer-events: none;
-}
-.inkmeter-panel::before {
-  top: -48px;
-  right: -24px;
-  width: 180px;
-  height: 180px;
-}
-.inkmeter-panel::after {
-  left: -56px;
-  bottom: -80px;
-  width: 220px;
-  height: 220px;
 }
 .inkmeter-panel * {
   box-sizing: border-box;
   color: inherit;
 }
-.inkmeter-panel__lead,
-.inkmeter-panel__meta {
+
+/* Bar */
+.inkmeter-panel__bar {
   position: relative;
-  z-index: 1;
-}
-.inkmeter-panel__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--inkmeter-text);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.inkmeter-panel.notice .inkmeter-panel__title {
-  margin: 16px 0 10px;
-  color: var(--inkmeter-text);
-  font-size: 31px;
-  line-height: 1.05;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-.inkmeter-panel.notice .inkmeter-panel__description {
-  margin: 0;
-  max-width: 54ch;
-  color: var(--inkmeter-muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-.inkmeter-panel__stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 20px;
-}
-.inkmeter-panel__stat {
-  padding: 14px 16px;
-  border: 1px solid var(--inkmeter-soft);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-}
-.inkmeter-panel__stat-label {
-  display: block;
-  margin-bottom: 7px;
-  color: var(--inkmeter-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.inkmeter-panel__stat-value {
-  display: block;
-  color: var(--inkmeter-text);
-  font-size: 20px;
-  line-height: 1.1;
-  font-weight: 800;
-}
-.inkmeter-panel__meta {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  border: 1px solid var(--inkmeter-strong);
-  border-radius: 18px;
-  background: rgba(8, 26, 49, 0.24);
-  backdrop-filter: blur(10px);
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(150px, 190px) auto;
+  grid-template-areas: "score summary recent progress toggle";
+  align-items: center;
+  gap: 12px 20px;
 }
 .inkmeter-panel__score {
+  grid-area: score;
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  margin-bottom: 12px;
-  color: var(--inkmeter-text);
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 14px 9px;
+  border: 1px solid var(--inkmeter-strong);
+  border-radius: 14px;
+  background: rgba(8, 26, 49, 0.24);
 }
 .inkmeter-panel__score-value {
-  font-size: 68px;
+  font-size: 40px;
   line-height: 0.9;
   font-weight: 900;
   letter-spacing: -0.06em;
 }
 .inkmeter-panel__score-unit {
-  padding-bottom: 8px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--inkmeter-muted);
 }
+.inkmeter-panel__summary {
+  grid-area: summary;
+  min-width: 0;
+}
 .inkmeter-panel__status {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 13px;
+  gap: 4px 10px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--inkmeter-text);
 }
 .inkmeter-panel__status-dot {
-  width: 10px;
-  height: 10px;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin: 0 -2px 0 3px;
   border-radius: 999px;
   background: #ffd166;
-  box-shadow: 0 0 0 6px rgba(255, 209, 102, 0.18);
+  box-shadow: 0 0 0 5px rgba(255, 209, 102, 0.18);
 }
 .inkmeter-panel.is-hot .inkmeter-panel__status-dot {
   background: #7ef7c3;
-  box-shadow: 0 0 0 6px rgba(126, 247, 195, 0.18);
+  box-shadow: 0 0 0 5px rgba(126, 247, 195, 0.18);
+}
+.inkmeter-panel__freeze-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(154, 216, 255, 0.18);
+  color: #d6efff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.inkmeter-panel__freeze-count::before,
+.inkmeter-panel__freezes::before {
+  content: "\2744\FE0F";
+  margin-right: 6px;
+}
+/* WordPress styles .notice p, so the panel's paragraphs need the extra class. */
+.inkmeter-panel.notice .inkmeter-panel__description {
+  margin: 3px 0 0;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.inkmeter-panel__label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--inkmeter-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.inkmeter-panel__recent {
+  grid-area: recent;
+  min-width: 0;
+}
+.inkmeter-panel__recent-days {
+  display: flex;
+  gap: 3px;
+}
+.inkmeter-panel__recent-days .inkmeter-history__day {
+  width: 13px;
+  height: 13px;
+}
+.inkmeter-panel__recent-days .inkmeter-history__day.is-today {
+  box-shadow: 0 0 0 1.5px var(--inkmeter-text);
+}
+/* Today without a post yet: an outline waiting to be filled. */
+.inkmeter-panel__recent-days .inkmeter-history__day.is-today.is-empty {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--inkmeter-muted);
+}
+.inkmeter-panel__progress {
+  grid-area: progress;
 }
 .inkmeter-panel__progress-copy {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 6px;
   color: var(--inkmeter-muted);
   font-size: 12px;
+}
+.inkmeter-panel__progress-copy b {
+  color: var(--inkmeter-text);
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .inkmeter-panel__progress-track {
-  height: 10px;
+  height: 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
   overflow: hidden;
@@ -178,22 +167,304 @@
   border-radius: inherit;
   background: linear-gradient(90deg, #ffd166 0%, #ff7a59 100%);
 }
-@media (max-width: 960px) {
-  .inkmeter-panel {
-    grid-template-columns: 1fr;
+.inkmeter-panel__toggle {
+  grid-area: toggle;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--inkmeter-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--inkmeter-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.inkmeter-panel__toggle:hover,
+.inkmeter-panel__toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+}
+.inkmeter-panel__toggle:focus-visible,
+.inkmeter-panel__dismiss:focus-visible {
+  outline: 2px solid var(--inkmeter-text);
+  outline-offset: 2px;
+}
+.inkmeter-panel__toggle svg {
+  transition: transform 0.18s ease;
+}
+.inkmeter-panel__toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+/* Inkmeter Pro link. WordPress colors div.notice a with the admin color scheme,
+   which is unreadable on the panel, so this selector has to outrank it. */
+.inkmeter-panel.notice .inkmeter-panel__reminders {
+  position: relative;
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--inkmeter-soft);
+  color: var(--inkmeter-text);
+  font-size: 13px;
+}
+.inkmeter-panel.notice .inkmeter-panel__reminders a {
+  color: var(--inkmeter-text);
+  text-decoration: underline;
+  text-decoration-color: var(--inkmeter-strong);
+  text-underline-offset: 3px;
+}
+.inkmeter-panel.notice .inkmeter-panel__reminders a:hover,
+.inkmeter-panel.notice .inkmeter-panel__reminders a:focus {
+  color: var(--inkmeter-text);
+  text-decoration-color: currentColor;
+}
+.inkmeter-panel__dismiss {
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--inkmeter-muted);
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.inkmeter-panel__dismiss:hover,
+.inkmeter-panel__dismiss:focus {
+  color: var(--inkmeter-text);
+}
+
+/* Details: the stats and the goal beside the past year. */
+.inkmeter-panel__details {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  align-items: start;
+  gap: 14px 28px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--inkmeter-soft);
+}
+.inkmeter-panel__aside {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.inkmeter-panel__stats {
+  margin: 0;
+  padding: 2px 12px;
+  border: 1px solid var(--inkmeter-soft);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.inkmeter-panel__stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+}
+.inkmeter-panel__stat + .inkmeter-panel__stat {
+  border-top: 1px solid var(--inkmeter-soft);
+}
+.inkmeter-panel__stat-label {
+  color: var(--inkmeter-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.inkmeter-panel__stat-value {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: right;
+}
+.inkmeter-panel.notice .inkmeter-panel__freezes,
+.inkmeter-panel.notice .inkmeter-panel__sites {
+  margin: 0;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+.inkmeter-panel__goal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  color: var(--inkmeter-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inkmeter-panel__goal-change summary {
+  color: var(--inkmeter-muted);
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: var(--inkmeter-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+.inkmeter-panel__goal-change summary::-webkit-details-marker {
+  display: none;
+}
+.inkmeter-panel__goal-change summary:hover,
+.inkmeter-panel__goal-change summary:focus {
+  color: var(--inkmeter-text);
+}
+.inkmeter-panel__goal-change[open] summary {
+  display: none;
+}
+/* While choosing, the select already shows the current goal. */
+.inkmeter-panel__goal:has(.inkmeter-panel__goal-change[open]) > span {
+  display: none;
+}
+.inkmeter-panel__goal-change form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+/* The drafts checkbox gets its own line, between the goal and the button. */
+.inkmeter-panel__drafts {
+  display: flex;
+  flex-basis: 100%;
+  gap: 6px;
+  align-items: center;
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.inkmeter-panel__drafts input[type="checkbox"] {
+  margin: 0;
+}
+.inkmeter-panel__goal-change select {
+  min-height: 30px;
+}
+
+/* History calendar: a column per week, a cell per day. */
+.inkmeter-panel__history {
+  min-width: 0;
+}
+.inkmeter-history__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+.inkmeter-history__title {
+  color: var(--inkmeter-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.inkmeter-history__summary {
+  color: var(--inkmeter-muted);
+  font-size: 13px;
+}
+/* Right to left so a grid wider than the screen opens on the latest weeks. */
+.inkmeter-history__grid {
+  overflow-x: auto;
+  padding-bottom: 4px;
+  direction: rtl;
+  scrollbar-width: thin;
+  scrollbar-color: var(--inkmeter-strong) transparent;
+}
+.inkmeter-history__grid > * {
+  direction: ltr;
+}
+.inkmeter-history__months,
+.inkmeter-history__weeks {
+  display: flex;
+  gap: 2px;
+  width: max-content;
+}
+.inkmeter-history__months span {
+  width: 9px;
+  overflow: visible;
+  white-space: nowrap;
+  color: var(--inkmeter-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+.inkmeter-history__week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.inkmeter-history__day {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--inkmeter-soft);
+}
+/* Smaller cells, so the past year fits beside the stats. */
+.inkmeter-history__weeks .inkmeter-history__day {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+.inkmeter-history__day.is-published {
+  background: #ffd166;
+}
+.inkmeter-history__day.is-frozen {
+  background: #9ad8ff;
+}
+.inkmeter-history__day.is-future {
+  background: rgba(255, 255, 255, 0.05);
+}
+.inkmeter-history__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+  color: var(--inkmeter-muted);
+  font-size: 12px;
+}
+.inkmeter-history__legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Narrower screens: the last days and the milestone move under the status. */
+@media (max-width: 1180px) {
+  .inkmeter-panel__bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "score summary toggle"
+      "score recent progress";
+  }
+  .inkmeter-panel__progress {
+    min-width: 140px;
+  }
+  .inkmeter-panel__details {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .inkmeter-panel {
-    padding: 20px;
+    padding: 12px;
   }
-  .inkmeter-panel__title {
-    font-size: 26px;
-  }
-  .inkmeter-panel__stats {
-    grid-template-columns: 1fr;
+  .inkmeter-panel__bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "score summary summary"
+      "recent recent recent"
+      "progress progress toggle";
+    gap: 12px 14px;
   }
   .inkmeter-panel__score-value {
-    font-size: 56px;
+    font-size: 34px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inkmeter-panel__toggle svg {
+    transition: none;
   }
 }
