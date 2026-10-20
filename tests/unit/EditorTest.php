@@ -2,6 +2,7 @@
 
 namespace MerkushinTest\Inkmeter;
 
+use Merkushin\Inkmeter\AssetVersions;
 use Merkushin\Inkmeter\Editor;
 use Merkushin\Inkmeter\Streak;
 use Merkushin\Wpal\Service\Assets;
@@ -118,7 +119,7 @@ class EditorTest extends TestCase {
 				'inkmeter-editor',
 				'https://example.com/wp-content/plugins/inkmeter/assets/dist/javascript/editor.js',
 				$this->containsEqual( 'wp-plugins' ),
-				'1.1.0',
+				'editor-hash',
 				true
 			);
 		$this->assets
@@ -197,6 +198,9 @@ class EditorTest extends TestCase {
 	}
 
 	private function create_editor(): Editor {
-		return new Editor( $this->streak, self::PLUGIN_FILE, '1.1.0' );
+		$asset_versions = $this->createMock( AssetVersions::class );
+		$asset_versions->method( 'get' )->willReturnMap( [ [ 'javascript/editor.js', 'editor-hash' ] ] );
+
+		return new Editor( $this->streak, self::PLUGIN_FILE, $asset_versions );
 	}
 }

@@ -116,20 +116,26 @@ class Plugin {
 	 */
 	private $editor;
 
-	public function __construct( string $plugin_file, ?Streak $streak = null, ?GoalForm $goal_form = null, ?Pro $pro = null, ?Editor $editor = null ) {
-		$this->plugin_file   = $plugin_file;
-		$this->hooks         = ServiceFactory::create_hooks();
-		$this->assets        = ServiceFactory::create_assets();
-		$this->plugins       = ServiceFactory::create_plugins();
-		$this->screen        = ServiceFactory::create_screen();
-		$this->localization  = ServiceFactory::create_localization();
-		$this->dates         = ServiceFactory::create_dates();
-		$this->options       = ServiceFactory::create_options();
-		$this->user_settings = ServiceFactory::create_user_settings();
-		$this->streak        = $streak ?? new Streak();
-		$this->goal_form     = $goal_form ?? new GoalForm( $this->streak );
-		$this->pro           = $pro ?? new Pro( self::VERSION );
-		$this->editor        = $editor ?? new Editor( $this->streak, $plugin_file, self::VERSION );
+	/**
+	 * @var AssetVersions
+	 */
+	private $asset_versions;
+
+	public function __construct( string $plugin_file, ?Streak $streak = null, ?GoalForm $goal_form = null, ?Pro $pro = null, ?Editor $editor = null, ?AssetVersions $asset_versions = null ) {
+		$this->plugin_file    = $plugin_file;
+		$this->hooks          = ServiceFactory::create_hooks();
+		$this->assets         = ServiceFactory::create_assets();
+		$this->plugins        = ServiceFactory::create_plugins();
+		$this->screen         = ServiceFactory::create_screen();
+		$this->localization   = ServiceFactory::create_localization();
+		$this->dates          = ServiceFactory::create_dates();
+		$this->options        = ServiceFactory::create_options();
+		$this->user_settings  = ServiceFactory::create_user_settings();
+		$this->streak         = $streak ?? new Streak();
+		$this->goal_form      = $goal_form ?? new GoalForm( $this->streak );
+		$this->pro            = $pro ?? new Pro( self::VERSION );
+		$this->asset_versions = $asset_versions ?? new AssetVersions( dirname( $plugin_file ) . '/assets/dist', self::VERSION );
+		$this->editor         = $editor ?? new Editor( $this->streak, $plugin_file, $this->asset_versions );
 	}
 
 	public function init(): void {
@@ -151,9 +157,9 @@ class Plugin {
 
 		$url = $this->plugins->plugin_dir_url( $this->plugin_file );
 
-		$this->assets->wp_enqueue_style( 'inkmeter-admin', $url . 'assets/dist/styles/admin.css', [], self::VERSION );
+		$this->assets->wp_enqueue_style( 'inkmeter-admin', $url . 'assets/dist/styles/admin.css', [], $this->asset_versions->get( 'styles/admin.css' ) );
 		// The script saves the Screen Options checkbox with setUserSetting() from WordPress' utils script.
-		$this->assets->wp_enqueue_script( 'inkmeter-admin', $url . 'assets/dist/javascript/admin.js', [ 'utils' ], self::VERSION, true );
+		$this->assets->wp_enqueue_script( 'inkmeter-admin', $url . 'assets/dist/javascript/admin.js', [ 'utils' ], $this->asset_versions->get( 'javascript/admin.js' ), true );
 	}
 
 	public function render_streak_panel(): void {

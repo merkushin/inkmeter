@@ -23,6 +23,7 @@ define( 'ABSPATH', __DIR__ . '/' );
 
 $GLOBALS['smoke_actions']    = [];
 $GLOBALS['smoke_enqueued']   = [];
+$GLOBALS['smoke_versions']   = [];
 $GLOBALS['smoke_transients'] = [];
 $GLOBALS['smoke_options']    = [
 	'date_format'   => 'F j, Y',
@@ -259,12 +260,14 @@ function register_rest_route( $route_namespace, $route, $args = [], $override = 
 	return true;
 }
 
-function wp_enqueue_style( string $handle, string $src = '' ): void {
-	$GLOBALS['smoke_enqueued'][] = $src;
+function wp_enqueue_style( string $handle, string $src = '', array $deps = [], $ver = false ): void {
+	$GLOBALS['smoke_enqueued'][]       = $src;
+	$GLOBALS['smoke_versions'][ $src ] = $ver;
 }
 
-function wp_enqueue_script( string $handle, string $src = '' ): void {
-	$GLOBALS['smoke_enqueued'][] = $src;
+function wp_enqueue_script( string $handle, string $src = '', array $deps = [], $ver = false ): void {
+	$GLOBALS['smoke_enqueued'][]       = $src;
+	$GLOBALS['smoke_versions'][ $src ] = $ver;
 }
 
 function current_time( $type ) {
@@ -365,6 +368,13 @@ foreach ( [ 'admin_enqueue_scripts', 'all_admin_notices', 'screen_settings', 'sa
 smoke_do( 'admin_enqueue_scripts' );
 if ( 2 !== count( $GLOBALS['smoke_enqueued'] ) ) {
 	smoke_fail( 'expected 2 enqueued assets, got ' . count( $GLOBALS['smoke_enqueued'] ) );
+}
+// Each asset's ?ver= is the content hash from the build's versions.php, so a new build busts caches.
+foreach ( $GLOBALS['smoke_versions'] as $src => $ver ) {
+	$file = $build_dir . '/assets/dist/' . substr( (string) strstr( $src, 'assets/dist/' ), strlen( 'assets/dist/' ) );
+	if ( ! is_string( $ver ) || ! is_file( $file ) || substr( hash_file( 'sha256', $file ), 0, 16 ) !== $ver ) {
+		smoke_fail( "{$src} has version " . ( is_string( $ver ) ? $ver : gettype( $ver ) ) . ', not the hash of the built file' );
+	}
 }
 
 ob_start();

@@ -76,21 +76,21 @@ class Editor {
 	private $plugin_file;
 
 	/**
-	 * @var string
+	 * @var AssetVersions
 	 */
-	private $version;
+	private $asset_versions;
 
-	public function __construct( Streak $streak, string $plugin_file, string $version ) {
-		$this->hooks        = ServiceFactory::create_hooks();
-		$this->assets       = ServiceFactory::create_assets();
-		$this->plugins      = ServiceFactory::create_plugins();
-		$this->screen       = ServiceFactory::create_screen();
-		$this->capabilities = ServiceFactory::create_capabilities();
-		$this->rest_api     = ServiceFactory::create_rest_api();
-		$this->json         = ServiceFactory::create_json();
-		$this->streak       = $streak;
-		$this->plugin_file  = $plugin_file;
-		$this->version      = $version;
+	public function __construct( Streak $streak, string $plugin_file, AssetVersions $asset_versions ) {
+		$this->hooks          = ServiceFactory::create_hooks();
+		$this->assets         = ServiceFactory::create_assets();
+		$this->plugins        = ServiceFactory::create_plugins();
+		$this->screen         = ServiceFactory::create_screen();
+		$this->capabilities   = ServiceFactory::create_capabilities();
+		$this->rest_api       = ServiceFactory::create_rest_api();
+		$this->json           = ServiceFactory::create_json();
+		$this->streak         = $streak;
+		$this->plugin_file    = $plugin_file;
+		$this->asset_versions = $asset_versions;
 	}
 
 	public function init(): void {
@@ -109,7 +109,7 @@ class Editor {
 			self::SCRIPT,
 			$url . 'assets/dist/javascript/editor.js',
 			[ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-data', 'wp-i18n', 'wp-api-fetch', 'wp-notices' ],
-			$this->version,
+			$this->asset_versions->get( 'javascript/editor.js' ),
 			true
 		);
 		$settings = [
