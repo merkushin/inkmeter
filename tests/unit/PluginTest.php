@@ -11,6 +11,7 @@ use Merkushin\Wpal\Service\Plugins;
 use Merkushin\Wpal\Service\Screen;
 use Merkushin\Wpal\Service\UserSettings;
 use Merkushin\Wpal\ServiceFactory;
+use Merkushin\Inkmeter\AssetVersions;
 use Merkushin\Inkmeter\Editor;
 use Merkushin\Inkmeter\Goal;
 use Merkushin\Inkmeter\GoalForm;
@@ -145,13 +146,20 @@ class PluginTest extends TestCase {
 		$this->assets
 			->expects( $this->once() )
 			->method( 'wp_enqueue_style' )
-			->with( 'inkmeter-admin', self::PLUGIN_URL . 'assets/dist/styles/admin.css', [], Plugin::VERSION );
+			->with( 'inkmeter-admin', self::PLUGIN_URL . 'assets/dist/styles/admin.css', [], 'css-hash' );
 		$this->assets
 			->expects( $this->once() )
 			->method( 'wp_enqueue_script' )
-			->with( 'inkmeter-admin', self::PLUGIN_URL . 'assets/dist/javascript/admin.js', [ 'utils' ], Plugin::VERSION, true );
+			->with( 'inkmeter-admin', self::PLUGIN_URL . 'assets/dist/javascript/admin.js', [ 'utils' ], 'js-hash', true );
+		$asset_versions = $this->createMock( AssetVersions::class );
+		$asset_versions->method( 'get' )->willReturnMap(
+			[
+				[ 'styles/admin.css', 'css-hash' ],
+				[ 'javascript/admin.js', 'js-hash' ],
+			]
+		);
 
-		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor ) )->enqueue_admin_assets();
+		( new Plugin( self::PLUGIN_FILE, $this->streak, $this->goal_form, $this->pro, $this->editor, $asset_versions ) )->enqueue_admin_assets();
 	}
 
 	/**
